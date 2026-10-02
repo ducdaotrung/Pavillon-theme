@@ -9,7 +9,7 @@
     transition: background-color var(--motion-duration-standard) var(--motion-ease-standard);
   }
 
-  .header--overlay {
+  .header.header--overlay {
     background-color: transparent;
   }
 
@@ -26,7 +26,8 @@
   }
 
   .header--overlap-first-section {
-    margin-block-end: calc(var(--header-height, 0px) * -1);
+    z-index: var(--z-drawer);
+    margin-block-end: calc(var(--header-layout-height, 0px) * -1);
   }
 
   .header[data-sticky-type='always'],
@@ -34,7 +35,7 @@
     position: sticky;
     top: 0;
     inset-inline: 0;
-    z-index: var(--z-drawer);
+    z-index: var(--z-drawer, 200);
   }
 
   .header[data-sticky-type='scroll_up'] {
@@ -48,11 +49,20 @@
     transform: translateY(-100%);
   }
 
+  /* Keep the fixed drawer viewport-relative through its entire overlay
+     lifecycle, including the exit animation before [hidden] is restored,
+     and across viewport resizes. */
+  .header[data-sticky-type='scroll_up']:has([data-header-mobile-drawer]:not([hidden])) {
+    transform: none;
+    will-change: auto;
+    transition-property: background-color;
+  }
+
   .header[data-sticky-type='top_header_only'],
   .header[data-sticky-type='bottom_header_only'] {
     position: sticky;
     top: 0;
-    z-index: var(--z-drawer);
+    z-index: var(--z-drawer, 200);
   }
 
   @media (prefers-reduced-motion: reduce) {

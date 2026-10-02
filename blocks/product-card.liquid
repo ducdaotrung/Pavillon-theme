@@ -8,24 +8,20 @@
 
   @param {product} [product] - Product resource supplied by the parent list
   @param {boolean} [placeholder] - Whether to render the shared empty card state
-  @param {boolean} [show_ranking_override] - Internal parent override for legacy card settings
   @param {string} [color_type_override] - Internal parent override for legacy card settings
   @param {object} [color_scheme_override] - Internal parent override for legacy card settings
   @param {string} [editor_attributes_override] - Internal parent override for legacy editor attributes
 
   A parent may pass `placeholder: true` while a product resource is not
-  available so the card can preserve the parent layout in the Theme Editor.
+  available so the card can preserve the parent layout in the editor and
+  storefront preview.
 
   @example
   {% content_for 'block', type: 'product-card', id: 'product-card' %}
 {% enddoc %}
 
 {% liquid
-  assign card_product = product
-  assign product_card_show_ranking = block.settings.show_ranking
-  if show_ranking_override != nil
-    assign product_card_show_ranking = show_ranking_override
-  endif
+  assign card_product = closest.product | default: product
   assign product_card_color_type = block.settings.color_type
   if color_type_override != nil
     assign product_card_color_type = color_type_override
@@ -43,7 +39,6 @@
 {% if card_product != blank %}
   {% render 'product-card',
     product: card_product,
-    show_ranking: product_card_show_ranking,
     color_type: product_card_color_type,
     color_scheme: product_card_color_scheme,
     attributes: product_card_editor_attributes
@@ -52,7 +47,6 @@
   {% render 'product-card',
     product: blank,
     placeholder: true,
-    show_ranking: product_card_show_ranking,
     color_type: product_card_color_type,
     color_scheme: product_card_color_scheme,
     attributes: product_card_editor_attributes
@@ -87,15 +81,8 @@
       "content": "t:info.product_card_settings"
     },
     {
-      "type": "checkbox",
-      "id": "show_ranking",
-      "label": "t:labels.show_ranking",
-      "default": false
-    },
-    {
       "type": "header",
-      "content": "t:general.color",
-      "visible_if": "{{ settings.product_card_style == 'card' }}"
+      "content": "t:general.appearance"
     },
     {
       "type": "select",
@@ -105,15 +92,14 @@
         { "value": "inherit", "label": "t:options.color_type.inherit" },
         { "value": "color_scheme", "label": "t:options.color_type.color_scheme" }
       ],
-      "default": "inherit",
-      "visible_if": "{{ settings.product_card_style == 'card' }}"
+      "default": "inherit"
     },
     {
       "type": "color_scheme",
       "id": "color_scheme",
       "label": "t:labels.color_scheme",
       "default": "scheme-1",
-      "visible_if": "{{ settings.product_card_style == 'card' and block.settings.color_type == 'color_scheme' }}"
+      "visible_if": "{{ block.settings.color_type == 'color_scheme' }}"
     }
   ],
   "presets": [
@@ -121,7 +107,6 @@
       "name": "t:general.product_card",
       "category": "t:general.product",
       "settings": {
-        "show_ranking": false,
         "color_type": "inherit",
         "color_scheme": "scheme-1"
       }

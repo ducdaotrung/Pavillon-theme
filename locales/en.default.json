@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin language editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "404": {
     "title": "404",
@@ -5,6 +14,7 @@
     "back_to_shopping": "Back to shopping"
   },
   "accessibility": {
+    "close": "Close",
     "account": "Account",
     "cart": "Cart",
     "menu": "Menu",
@@ -20,6 +30,9 @@
     "icon_shopping_bag": "Shopping bag icon",
     "icon_shopping_cart": "Shopping cart icon",
     "icon_user": "User icon",
+    "icon_paper_airplane": "Paper airplane icon",
+    "icon_chat_bubble": "Chat bubble icon",
+    "icon_cube": "Cube icon",
     "icon_truck": "Truck icon",
     "icon_tag": "Tag icon",
     "icon_trash": "Trash icon",
@@ -31,12 +44,16 @@
     "icon_plus": "Plus icon",
     "icon_minus": "Minus icon",
     "icon_check": "Check icon",
+    "icon_shield_check": "Shield check icon",
     "icon_cart": "Cart icon",
     "icon_account": "Account icon",
     "icon_circle": "Circle icon",
     "icon_square": "Square icon",
     "icon_triangle": "Triangle icon",
     "icon_diamond": "Diamond icon",
+    "icon_four-stars": "4 stars icon",
+    "icon_five-stars": "5 stars icon",
+    "icon_link": "Icon link",
     "loading": "Loading",
     "quantity": "Quantity",
     "social_media": "Social media",
@@ -45,9 +62,29 @@
     "policy_links": "Store policies",
     "pagination": "Pagination",
     "collection_tabs": "Collection tabs",
+    "shop_the_look_products": "Shop the look products",
+    "shop_the_look_product": "View {{ product }}",
+    "shop_the_look_product_placeholder": "Select a product for this hotspot",
+    "product_callout_hotspots": "Product hotspots",
+    "product_callout_hotspot": "View {{ product }}",
+    "product_callout_hotspot_placeholder": "Select a product for this hotspot",
+    "product_callout_hotspot_content": "View {{ title }}",
+    "product_callout_hotspot_content_fallback": "Hotspot details",
+    "hotspot_carousel": "Hotspot carousel",
+    "hotspot_carousel_empty": "Add a Product callout slide to get started.",
     "share": "Share",
     "link_copied": "Link copied.",
-    "share_error": "Unable to share."
+    "share_error": "Unable to share.",
+    "image_card_link": "Open image card"
+  },
+  "comparison_table": {
+    "features_heading": "Features",
+    "table_label": "Product comparison",
+    "scroll_label": "Scroll horizontally to compare products",
+    "more_information": "More information about {{ feature }}",
+    "yes": "Yes",
+    "no": "No",
+    "not_provided": "Not provided"
   },
   "blog": {
     "article_comments": "Comments",
@@ -58,6 +95,10 @@
     "comment_form_submit": "Post",
     "comment_form_title": "Add a comment"
   },
+  "breadcrumbs": {
+    "home": "Home",
+    "navigation_label": "Breadcrumb"
+  },
   "cart": {
     "add_error": "Unable to add this item. Please try again.",
     "close": "Close cart",
@@ -66,6 +107,10 @@
     "decrease": "Decrease quantity",
     "empty": "Your cart is empty",
     "increase": "Increase quantity",
+    "duties_and_taxes_included": "Duties and taxes included.",
+    "duties_included": "Duties included.",
+    "shipping_policy_html": "<a href=\"{{ link }}\">Shipping</a> calculated at checkout.",
+    "taxes_included": "Taxes included.",
     "taxes_at_checkout": "Taxes and shipping calculated at checkout.",
     "total": "Total",
     "title": "Cart",
@@ -137,13 +182,41 @@
     "next": "Next slide",
     "view_all": "View all"
   },
+  "collection_list": {
+    "default_title": "Collection",
+    "default_description": "Collection description",
+    "products_count": "{{ count }} products",
+    "previous": "Previous collection",
+    "next": "Next collection"
+  },
+  "press": {
+    "carousel_label": "Press quotes",
+    "go_to_slide": "Go to press quote {{ index }}",
+    "empty_section": "Add an Eyebrow and Quotes block to get started.",
+    "empty_quotes": "Add press items to get started."
+  },
   "video": {
     "play": "Play video",
     "pause": "Pause video"
   },
+  "image_comparison": {
+    "compare": "Image comparison",
+    "slider_label": "Image comparison position",
+    "before_image_alt": "Before image",
+    "after_image_alt": "After image"
+  },
+  "countdown": {
+    "days": "Days",
+    "hours": "Hours",
+    "minutes": "Min",
+    "seconds": "Sec",
+    "expired": "The countdown has ended."
+  },
   "products": {
+    "category": "Category",
     "product_title": "Product title",
     "product_description": "Product description",
+    "product_description_placeholder": "Tell customers more about your product in detail. Highlight its key features, materials, design, sizing, and anything else that makes it special and worth choosing.",
     "product_accordion": "Product details",
     "variant_picker": "Product options",
     "size_guide": "Size guide",
@@ -152,8 +225,15 @@
     "variant_selection_unavailable": "This combination is unavailable. Choose another option.",
     "add_to_cart": "Add to cart",
     "options": "Options",
+    "choose_options": "Choose options",
+    "show_all_options": "Show all options",
     "quick_add": "Quick add",
     "quick_view": "Quick view",
+    "view_product": "View product",
+    "quick_add_error": "Unable to load quick add. Please try again.",
+    "quick_add_retry": "Try again",
+    "quick_view_error": "Unable to load this product. Please try again.",
+    "quick_view_retry": "Try again",
     "placeholder_title": "Product title",
     "rating": "Rated {{ rating }} out of {{ scale }}",
     "no_product": "Product unavailable in this context.",
@@ -189,6 +269,43 @@
     "read_more": "Read more",
     "read_less": "Read less"
   },
+  "collection": {
+    "apply_filters": "Apply ({{ count }})",
+    "apply_sort": "Apply",
+    "clear_all": "Clear all",
+    "close_filters": "Close filters",
+    "empty": "No products found",
+    "empty_help": "Try removing a filter or explore another collection.",
+    "filter": "Filter",
+    "filters": "Filters",
+    "next": "Next",
+    "next_page": "Next page",
+    "pagination": "Collection pagination",
+    "previous": "Previous",
+    "previous_page": "Previous page",
+    "price_from": "From",
+    "price_to": "To",
+    "product_count": {
+      "one": "{{ count }} product",
+      "other": "{{ count }} products"
+    },
+    "item_count": {
+      "one": "{{ count }} item",
+      "other": "{{ count }} items"
+    },
+    "columns": "columns",
+    "products_heading": "Products",
+    "promo_link": "Open promotion",
+    "read_less": "Read less",
+    "read_more": "Read more",
+    "sort_by": "Sort:",
+    "sort_trigger": "Sort by",
+    "grid_view": "Grid view",
+    "view": "View",
+    "view_more": "View more",
+    "view_less": "View less",
+    "load_more": "Load more"
+  },
   "gift_card": {
     "add_to_apple_wallet": "Add to Apple Wallet",
     "card": "Gift card",
@@ -223,6 +340,37 @@
     "no_results": "No results found",
     "no_results_html": "No results found for {{ terms }}",
     "results_for_html": "{{ count }} results found for {{ terms }}"
+  },
+  "bundle_builder": {
+    "add_item": "Add to bundle",
+    "added_item": "Added to bundle",
+    "remove_item": "Remove",
+    "add_product": "Add {{ product }} to bundle",
+    "select_variant_for": "Choose a variant for {{ product }}",
+    "remove_product": "Remove {{ product }} from bundle",
+    "products": "Bundle products",
+    "choose_products": "Select products or a collection to display bundle items.",
+    "progress": "Bundle reward progress",
+    "empty_bundle": "Your bundle is empty.",
+    "subtotal_before_discount": "Total",
+    "saving": "You save",
+    "line_total": "Line total",
+    "add_bundle": "Add bundle to cart",
+    "view_bundle": "View bundle",
+    "item": "item",
+    "items": "items",
+    "decrease_quantity": "Decrease quantity",
+    "increase_quantity": "Increase quantity",
+    "item_quantity": "Item quantity",
+    "javascript_required": "Enable JavaScript to build and add your bundle."
+  },
+  "timeline": {
+    "carousel_label": "Timeline milestone slides",
+    "navigation_label": "Timeline milestones",
+    "show_milestone": "Show milestone {{ year }}",
+    "previous": "Previous timeline item",
+    "next": "Next timeline item",
+    "add_milestone": "Add a slide to get started"
   },
   "social": {
     "facebook": "Facebook",

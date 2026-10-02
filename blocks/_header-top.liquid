@@ -26,14 +26,14 @@
   endif
 
   assign header_top_class = 'header-top'
+  assign header_transparent_scheme = section.settings.transparent_color_scheme | default: settings.overlay_color_scheme | default: section.settings.color_scheme | default: 'scheme-1'
+  if section.settings.transparent_color_scheme.id != blank
+    assign header_transparent_scheme = section.settings.transparent_color_scheme.id
+  elsif settings.overlay_color_scheme.id != blank
+    assign header_transparent_scheme = settings.overlay_color_scheme.id
+  endif
+  assign header_transparent_scheme = header_transparent_scheme | default: 'scheme-1' | handleize
   if header_overlay_enabled
-    assign header_transparent_scheme = section.settings.transparent_color_scheme | default: settings.overlay_color_scheme | default: section.settings.color_scheme | default: 'scheme-1'
-    if section.settings.transparent_color_scheme.id != blank
-      assign header_transparent_scheme = section.settings.transparent_color_scheme.id
-    elsif settings.overlay_color_scheme.id != blank
-      assign header_transparent_scheme = settings.overlay_color_scheme.id
-    endif
-    assign header_transparent_scheme = header_transparent_scheme | default: 'scheme-1' | handleize
     assign header_top_class = header_top_class | append: ' header-top--transparent-scheme section-color-scope ' | append: header_transparent_scheme
   endif
 
@@ -83,9 +83,9 @@
   data-header-root
   data-header-scheme="{{ header_scheme }}"
   data-sticky-type="{{ header_sticky_type }}"
-  {% if template.name == 'index' and header_sticky_type != 'none' %}data-header-overlap-first-section{% endif %}
+  {% if header_overlay_enabled %}data-header-overlap-first-section{% endif %}
   {% if header_overlay_enabled %}data-header-overlay{% endif %}
-  {% if header_overlay_enabled %}data-header-transparent-scheme="{{ header_transparent_scheme }}"{% endif %}
+  data-header-transparent-scheme="{{ header_transparent_scheme }}"
   {% if header_top_style != blank %}style="{{ header_top_style }}"{% endif %}
   {{ block.shopify_attributes }}
 >
@@ -194,6 +194,7 @@
   }
 
   .header-top :where(.header-search, .header-account, .header-cart) {
+    position: relative;
     display: inline-flex;
     flex: 0 0 auto;
     align-items: center;
@@ -222,19 +223,11 @@
     white-space: nowrap;
   }
 
-  .header-top .header-cart__count {
-    min-width: 1.25em;
-    aspect-ratio: 1 / 1;
-    font-size: 10px;
-    line-height: 1;
-    text-align: center;
-  }
-
   .header-top .header-divider {
     flex: 0 0 auto;
   }
 
-  @media (max-width: 767.98px) {
+  @media (max-width: 991.98px) {
     .header-top {
       padding-top: var(--header-top-padding-top-mobile, var(--header-top-padding-top, 12px));
       padding-bottom: var(--header-top-padding-bottom-mobile, var(--header-top-padding-bottom, 12px));

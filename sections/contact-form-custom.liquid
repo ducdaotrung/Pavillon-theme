@@ -21,7 +21,7 @@
   endcase
 
   assign contact_form_custom_alignment_mobile = contact_form_custom_alignment
-  if section.settings.customize_mobile_alignment
+  if contact_form_custom_direction == 'vertical' or section.settings.customize_mobile_alignment
     assign contact_form_custom_alignment_mobile = 'start'
     case section.settings.alignment_mobile
       when 'center'
@@ -37,7 +37,6 @@
   assign padding_bottom_mobile = section.settings.padding_bottom_mobile | default: 0 | plus: 0
   assign contact_form_custom_gap_desktop = section.settings.gap_desktop | default: 80 | plus: 0
   assign contact_form_custom_gap_mobile = section.settings.gap_mobile | default: 40 | plus: 0
-  assign contact_form_custom_overlay_opacity = section.settings.background_overlay_opacity | default: 0 | plus: 0
   assign contact_form_custom_background_type = section.settings.background_type | default: 'color'
   assign contact_form_custom_has_background_image = false
   if section.settings.background_image != blank or section.settings.background_image_mobile != blank
@@ -49,9 +48,6 @@
   endif
   if contact_form_custom_gap_mobile < 0 or contact_form_custom_gap_mobile > 100
     assign contact_form_custom_gap_mobile = 40
-  endif
-  if contact_form_custom_overlay_opacity < 0 or contact_form_custom_overlay_opacity > 100
-    assign contact_form_custom_overlay_opacity = 0
   endif
 
   assign contact_form_custom_width = 'page-width'
@@ -75,11 +71,10 @@
   --contact-form-custom-align-items: {{ contact_form_custom_align_items }};
   {% if contact_form_custom_background_type == 'color' and section.settings.background_color != blank %}--contact-form-custom-background-color: {{ section.settings.background_color | escape }};{% endif %}
   {% if contact_form_custom_background_type == 'image' and section.settings.background_overlay_color != blank %}--contact-form-custom-overlay-color: {{ section.settings.background_overlay_color | escape }};{% endif %}
-  {% if contact_form_custom_background_type == 'image' and contact_form_custom_overlay_opacity != 0 %}--contact-form-custom-overlay-opacity: {{ contact_form_custom_overlay_opacity }}%;{% endif %}
   {% if padding_top != 0 %}--contact-form-custom-padding-top: {{ padding_top }}px;{% endif %}
   {% if padding_bottom != 0 %}--contact-form-custom-padding-bottom: {{ padding_bottom }}px;{% endif %}
-  {% if contact_form_custom_gap_desktop != 12 %}--contact-form-custom-gap-desktop: {{ contact_form_custom_gap_desktop }}px;{% endif %}
-  {% if contact_form_custom_gap_mobile != 12 and contact_form_custom_gap_mobile != contact_form_custom_gap_desktop %}--contact-form-custom-gap-mobile: {{ contact_form_custom_gap_mobile }}px;{% endif %}
+  --contact-form-custom-gap-desktop: {{ contact_form_custom_gap_desktop }}px;
+  --contact-form-custom-gap-mobile: {{ contact_form_custom_gap_mobile }}px;
   {% if section.settings.customize_mobile_padding %}
     {% if padding_top_mobile != padding_top %}--contact-form-custom-padding-top-mobile: {{ padding_top_mobile }}px;{% endif %}
     {% if padding_bottom_mobile != padding_bottom %}--contact-form-custom-padding-bottom-mobile: {{ padding_bottom_mobile }}px;{% endif %}
@@ -104,7 +99,7 @@
         {% endif %}
       </div>
     {% endif %}
-    {% if contact_form_custom_background_type == 'image' and contact_form_custom_overlay_opacity > 0 %}
+    {% if contact_form_custom_background_type == 'image' and section.settings.background_overlay_color != blank %}
       <div class="contact-form-custom__overlay" aria-hidden="true"></div>
     {% endif %}
 
@@ -160,7 +155,6 @@
     inset: 0;
     z-index: 1;
     background: var(--contact-form-custom-overlay-color, #000);
-    opacity: var(--contact-form-custom-overlay-opacity, 0);
     pointer-events: none;
   }
   .contact-form-custom__grid {
@@ -182,10 +176,7 @@
   }
   .contact-form-custom__grid > .group {
     grid-column: 2;
-    width: 100%;
-    max-width: none;
-    --group-align: var(--contact-form-custom-align, start);
-    --group-align-mobile: var(--contact-form-custom-align-mobile, var(--contact-form-custom-align, start));
+    justify-self: var(--contact-form-custom-align, start);
   }
   .contact-form-custom .contact-form-block input.form__control--input,
   .contact-form-custom .contact-form-block textarea.form__control--textarea {
@@ -231,6 +222,7 @@
     .contact-form-custom__grid > .image-block,
     .contact-form-custom__grid > .group {
       grid-column: 1;
+      justify-self: var(--contact-form-custom-align-mobile, var(--contact-form-custom-align, start));
     }
     .contact-form-custom__grid > .image-block {
       grid-row: auto;
@@ -314,14 +306,15 @@
       "type": "checkbox",
       "id": "customize_mobile_alignment",
       "label": "t:labels.customize_mobile_alignment",
-      "default": false
+      "default": false,
+      "visible_if": "{{ section.settings.direction == 'horizontal' }}"
     },
     {
       "type": "text_alignment",
       "id": "alignment_mobile",
       "label": "t:labels.mobile_alignment",
       "default": "left",
-      "visible_if": "{{ section.settings.customize_mobile_alignment }}"
+      "visible_if": "{{ section.settings.direction == 'vertical' or section.settings.customize_mobile_alignment }}"
     },
     {
       "type": "header",
@@ -373,6 +366,7 @@
     },
     {
       "type": "color",
+      "alpha": true,
       "id": "background_color",
       "label": "t:labels.background_color",
       "visible_if": "{{ section.settings.background_type == 'color' }}"
@@ -393,18 +387,8 @@
       "type": "color",
       "id": "background_overlay_color",
       "label": "t:labels.overlay_color",
-      "default": "#000000",
-      "visible_if": "{{ section.settings.background_type == 'image' }}"
-    },
-    {
-      "type": "range",
-      "id": "background_overlay_opacity",
-      "label": "t:labels.overlay_opacity",
-      "min": 0,
-      "max": 100,
-      "step": 1,
-      "unit": "%",
-      "default": 0,
+      "alpha": true,
+      "default": "#00000000",
       "visible_if": "{{ section.settings.background_type == 'image' }}"
     },
     {

@@ -5,7 +5,25 @@
   endif
   assign cart_drawer_scheme = cart_drawer_scheme | default: 'scheme-1' | handleize
   assign cart_drawer_title = section.settings.title | default: 'Cart'
-  assign cart_drawer_title_size = section.settings.title_size | default: 'md'
+  assign cart_drawer_title_size = settings.overlay_title_size | default: 'md'
+  assign cart_drawer_custom_title_size = settings.overlay_custom_title_size | default: 24
+  assign cart_drawer_title_size_class = 'heading-md'
+  case cart_drawer_title_size
+    when 'display', 'heading_1'
+      assign cart_drawer_title_size_class = 'heading-display'
+    when 'xl', 'heading_2'
+      assign cart_drawer_title_size_class = 'heading-xl'
+    when 'lg', 'heading_3'
+      assign cart_drawer_title_size_class = 'heading-lg'
+    when 'md', 'heading_4'
+      assign cart_drawer_title_size_class = 'heading-md'
+    when 'sm', 'heading_5'
+      assign cart_drawer_title_size_class = 'heading-sm'
+    when 'xs', 'heading_6'
+      assign cart_drawer_title_size_class = 'heading-xs'
+    when 'custom'
+      assign cart_drawer_title_size_class = 'heading-custom'
+  endcase
   assign cart_drawer_title_limit = section.settings.title_line_limit | default: 'none'
   assign cart_drawer_show_count = section.settings.show_cart_count
   assign cart_drawer_share_label = 'cart_drawer.share_cart' | t
@@ -58,13 +76,11 @@
   else
     assign cart_drawer_shipping_message = cart_drawer_pending_message
   endif
-  assign cart_drawer_padding_desktop = '0px'
-  assign cart_drawer_padding_mobile = '0px'
+  assign cart_drawer_padding_desktop = 'var(--overlay-drawer-content-padding-desktop)'
+  assign cart_drawer_padding_mobile = 'var(--overlay-drawer-content-padding-mobile)'
+  assign cart_drawer_inset_desktop = '0px'
   if section.settings.enable_padding_desktop != false
-    assign cart_drawer_padding_desktop = 'var(--overlay-drawer-padding-desktop)'
-  endif
-  if section.settings.enable_padding_mobile != false
-    assign cart_drawer_padding_mobile = 'var(--overlay-drawer-padding-mobile)'
+    assign cart_drawer_inset_desktop = 'var(--overlay-drawer-padding-desktop)'
   endif
   capture cart_drawer_remove_icon
     render 'icon', icon: 'trash', bare: true
@@ -93,14 +109,36 @@
   assign cart_drawer_recommendation_icon_data = cart_drawer_recommendation_icon | escape
 %}
 
+{% if section.settings.show_recommendations %}
+  <script type="module" src="{{ 'cart-drawer-recommendations.js' | asset_url }}"></script>
+{% endif %}
+
+<link
+  rel="stylesheet"
+  href="{{ 'cart-drawer.css' | asset_url }}"
+  media="print"
+  onload="this.media='all'"
+>
+<noscript>{{ 'cart-drawer.css' | asset_url | stylesheet_tag }}</noscript>
+
 <div
   id="CartDrawer"
-  class="cart-drawer color-scheme section-color-scope {{ cart_drawer_scheme }}{% if section.settings.product_cards %} cart-drawer--product-cards{% endif %}{% if section.settings.enable_block_animations %} cart-drawer--animated{% endif %}"
+  class="component-overlay cart-drawer color-scheme section-color-scope {{ cart_drawer_scheme }}{% if section.settings.product_cards %} cart-drawer--product-cards{% endif %}{% if section.settings.enable_block_animations %} cart-drawer--animated{% endif %}"
+  data-component-overlay
+  data-append-to-body
+  data-desktop-layout="drawer"
+  data-mobile-layout="drawer"
+  data-state="closed"
+  scroll-lock
   aria-hidden="true"
+  role="dialog"
+  aria-modal="true"
+  aria-label="{{ cart_drawer_title | escape }}"
+  aria-labelledby="CartDrawerHeading"
   hidden
   data-cart-drawer
   data-section-id="{{ section.id }}"
-  style="--cart-drawer-width: {{ section.settings.desktop_width | default: 550 }}px; --cart-drawer-padding-desktop: {{ cart_drawer_padding_desktop }}; --cart-drawer-padding-mobile: {{ cart_drawer_padding_mobile }}; --cart-drawer-shipping-progress-color: {{ section.settings.progress_bar_color | default: 'var(--sale-price-color)' }}; --cart-drawer-shipping-success-color: {{ section.settings.free_shipping_success_color | default: '#5d874f' }}; --cart-drawer-custom-font-size: {{ section.settings.custom_title_size | default: 24 }}px;"
+  style="--component-overlay-width: {{ section.settings.desktop_width | default: 550 }}px; --cart-drawer-padding-desktop: {{ cart_drawer_padding_desktop }}; --cart-drawer-padding-mobile: {{ cart_drawer_padding_mobile }}; --cart-drawer-inset-desktop: {{ cart_drawer_inset_desktop }}; --cart-drawer-shipping-progress-color: {{ section.settings.progress_bar_color | default: 'var(--sale-price-color)' }}; --cart-drawer-shipping-success-color: {{ section.settings.free_shipping_success_color | default: '#5d874f' }};"
   data-cart-add-url="{{ routes.cart_add_url }}"
   data-cart-change-url="{{ routes.cart_change_url }}"
   data-cart-update-url="{{ routes.cart_update_url }}"
@@ -141,13 +179,12 @@
   data-discount-icon="{{ cart_drawer_discount_icon_data }}"
   data-recommendation-icon="{{ cart_drawer_recommendation_icon_data }}"
 >
-  <button class="cart-drawer__backdrop" type="button" aria-label="{{ 'cart.close' | t | escape }}" data-cart-drawer-close></button>
-  <span class="cart-drawer__backdrop-pointer" aria-hidden="true"></span>
+  <button class="component-overlay__backdrop backdrop-blur cart-drawer__backdrop" type="button" tabindex="-1" aria-label="{{ 'cart.close' | t | escape }}" data-component-overlay-backdrop></button>
 
-  <aside class="cart-drawer__panel drawer" data-drawer role="dialog" aria-modal="true" aria-labelledby="CartDrawerHeading" tabindex="-1">
+  <aside class="component-overlay__panel cart-drawer__panel drawer" data-drawer>
     <div class="cart-drawer__inner">
-      <header class="cart-drawer__header">
-        <h2 class="drawer__title cart-drawer__title heading-text heading-{{ cart_drawer_title_size }}" id="CartDrawerHeading" data-cart-drawer-title data-title-limit="{{ cart_drawer_title_limit }}">
+      <header class="component-overlay__header cart-drawer__header">
+        <h2 class="drawer__title {{ cart_drawer_title_size_class }}" id="CartDrawerHeading" data-cart-drawer-title data-title-limit="{{ cart_drawer_title_limit }}"{% if cart_drawer_title_size == 'custom' %} style="--overlay-title-size: {{ cart_drawer_custom_title_size }}px"{% endif %}>
           {{ cart_drawer_title | escape }}{% if cart_drawer_show_count %} <span class="cart-drawer__item-count body-text body-xs" data-cart-drawer-item-count aria-label="{{ cart.item_count }}">({{ cart.item_count }})</span>{% endif %}
         </h2>
         <div class="cart-drawer__header-actions">
@@ -161,11 +198,11 @@
               class: 'icon-button cart-drawer__share'
             %}
           {% endif %}
-          <button class="overlay-close cart-drawer__close" type="button" aria-label="{{ 'cart.close' | t | escape }}" data-cart-drawer-close>{% render 'icon', icon: 'x-mark', bare: true, class: 'overlay-close__icon' %}</button>
+          <button class="overlay-close component-overlay__close cart-drawer__close" type="button" aria-label="{{ 'cart.close' | t | escape }}" data-overlay-close>{% render 'icon', icon: 'x-mark', bare: true, class: 'overlay-close__icon' %}</button>
         </div>
       </header>
 
-      <div class="cart-drawer__body" data-cart-drawer-content aria-live="polite">
+      <div class="cart-drawer__body scrollbar scrollbar--vertical" data-cart-drawer-content aria-live="polite">
         <p class="cart-drawer__status visually-hidden" data-cart-drawer-status role="status" aria-live="polite" hidden></p>
         <div class="cart-drawer__loading" data-cart-drawer-loading hidden aria-hidden="true"><span class="cart-drawer__loading-spinner"></span></div>
 
@@ -174,6 +211,10 @@
             <div class="cart-drawer__shipping-progress-copy">
               <span class="cart-drawer__shipping-progress-icon" aria-hidden="true">
                 {% render 'icon', icon: 'truck', bare: true %}
+                <svg class="cart-drawer__shipping-progress-success-icon" viewBox="0 0 20 20" fill="none" focusable="false" aria-hidden="true">
+                  <circle cx="10" cy="10" r="9" fill="currentColor" />
+                  <path d="m6 10 2.5 2.5L14 7" stroke="var(--background-color)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
               </span>
               <div class="cart-drawer__shipping-progress-details">
                 <p class="body-text body-sm"><span data-cart-drawer-shipping-message>{{ cart_drawer_shipping_message }}</span></p>
@@ -219,7 +260,7 @@
               {% endif %}
               <article class="cart-drawer__item{% if line_is_sale %} is-sale{% endif %}" data-cart-line data-line-key="{{ item.key | escape }}" data-variant-id="{{ item.variant_id }}" data-compare-price="{{ line_original_price }}">
                 <a class="cart-drawer__item-media" href="{{ item.url }}" aria-label="{{ item.product.title | escape }}">
-                  {% render 'image', image: item.image, class: 'cart-drawer__image', width: 240, widths: '120, 180, 240', sizes: '7rem' %}
+                  {% render 'image', image: item.image, class: 'cart-drawer__image', width: 240, widths: '120, 180, 240', sizes: '7rem', placeholder: 'product-1' %}
                 </a>
                 <div class="cart-drawer__item-info">
                   <h3 class="cart-drawer__item-title card-title-text"><a href="{{ item.url }}">{{ item.product.title | escape }}</a></h3>
@@ -270,9 +311,21 @@
           <section class="cart-drawer__recommendations" data-cart-drawer-recommendations hidden aria-labelledby="CartDrawerRecommendationsHeading">
             <div class="cart-drawer__section-heading">
               <h3 id="CartDrawerRecommendationsHeading" class="cart-drawer__section-title heading-text heading-sm">{{ section.settings.recommendations_heading | default: 'You may also like' | escape }}</h3>
-              <div class="cart-drawer__recommendation-dots" data-cart-drawer-recommendation-dots></div>
+              <div
+                class="swiper-pagination cart-drawer__recommendation-pagination"
+                data-cart-drawer-recommendation-pagination
+                aria-label="{{ section.settings.recommendations_heading | default: 'You may also like' | escape }}"
+              ></div>
             </div>
-            <div class="cart-drawer__recommendation-list" data-cart-drawer-recommendation-list></div>
+            <div
+              class="swiper swiper-carousel--carousel cart-drawer__recommendation-list"
+              data-swiper-carousel
+              data-swiper-layout="carousel"
+              data-cart-drawer-recommendation-list
+              aria-label="{{ section.settings.recommendations_heading | default: 'You may also like' | escape }}"
+            >
+              <div class="swiper-wrapper"></div>
+            </div>
           </section>
         {% endif %}
 
@@ -314,8 +367,8 @@
 
       {% if section.settings.show_order_note or section.settings.show_shipping_estimator or section.settings.show_discount %}
         <button class="cart-drawer__order-options-backdrop" type="button" aria-label="Close cart options" data-cart-drawer-order-options-close></button>
-        <section class="bottom-sheet cart-drawer__order-options-panel" data-bottom-sheet data-cart-drawer-order-options aria-hidden="true">
-          <header class="cart-drawer__order-options-header" data-cart-drawer-order-options-sheet-header><span class="bottom-sheet__handle cart-drawer__order-options-sheet-handle" aria-hidden="true"></span><h3 class="heading-text heading-sm" data-cart-drawer-order-options-title>Cart options</h3><button class="overlay-close cart-drawer__order-options-close" type="button" aria-label="Close cart options" data-cart-drawer-order-options-close>{% render 'icon', icon: 'x-mark', bare: true, class: 'overlay-close__icon' %}</button></header>
+        <section class="bottom-sheet cart-drawer__order-options-panel component-sheet scrollbar scrollbar--both" data-bottom-sheet data-cart-drawer-order-options aria-hidden="true">
+          <header class="cart-drawer__order-options-header component-sheet__header" data-cart-drawer-order-options-sheet-header><span class="bottom-sheet__handle cart-drawer__order-options-sheet-handle" aria-hidden="true"></span><h3 class="heading-text heading-sm" data-cart-drawer-order-options-title>Cart options</h3><button class="overlay-close cart-drawer__order-options-close" type="button" aria-label="Close cart options" data-cart-drawer-order-options-close>{% render 'icon', icon: 'x-mark', bare: true, class: 'overlay-close__icon' %}</button></header>
           <div class="cart-drawer__order-options-content">
             {% if section.settings.show_order_note %}<div data-cart-drawer-order-options-content="note" hidden><label class="form__label" for="CartDrawerNote">Order special instructions</label><textarea class="form__control form__control--textarea" id="CartDrawerNote" rows="5" data-cart-drawer-note placeholder="{{ section.settings.order_note_placeholder | default: 'Add a note to your order' | escape }}">{{ cart.note | escape }}</textarea><button class="btn btn--primary cart-drawer__order-options-submit" type="button" data-cart-drawer-save-note>{{ section.settings.order_note_save_label | default: 'Save note' }}</button></div>{% endif %}
             {% if section.settings.show_shipping_estimator %}<div data-cart-drawer-order-options-content="shipping" hidden><form class="cart-drawer__shipping-estimator" data-cart-drawer-shipping-estimator><label class="form__label"><span>{{ 'cart_drawer.country' | t }}</span><select class="form__control form__control--select" name="country" data-cart-drawer-shipping-country required>{{ all_country_option_tags }}</select></label><label class="form__label"><span>{{ 'cart_drawer.postal_code' | t }}</span><input class="form__control form__control--input" type="text" name="zip" autocomplete="postal-code" required></label><button class="btn btn--primary cart-drawer__order-options-submit" type="submit">{{ 'cart_drawer.calculate' | t }}</button></form><div class="cart-drawer__shipping-rates body-text body-sm" data-cart-drawer-shipping-rates role="status" aria-live="polite"></div></div>{% endif %}
@@ -332,15 +385,13 @@
 {% stylesheet %}
   .cart-drawer {
     position: fixed;
-    z-index: var(--z-drawer);
+    z-index: var(--z-modal, 1000);
     inset: 0;
     visibility: hidden;
     background: transparent;
     color: var(--body-color);
-    opacity: 0;
     pointer-events: none;
-    transition: opacity var(--motion-duration-standard) var(--motion-ease-standard), visibility 0s linear var(--motion-duration-standard);
-    --cart-drawer-padding: var(--overlay-drawer-padding-desktop);
+    --cart-drawer-padding: var(--cart-drawer-padding-desktop, var(--overlay-drawer-content-padding-desktop, 1.5rem));
   }
 
   .cart-drawer[hidden] {
@@ -362,63 +413,37 @@
   }
 
   .cart-drawer.is-open {
-    opacity: 1;
     pointer-events: auto;
   }
 
   .cart-drawer.is-closing {
-    opacity: 0;
     pointer-events: none;
   }
 
   .cart-drawer__backdrop {
-    position: absolute;
-    z-index: 0;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    padding: 0;
-    border: 0;
-    background: var(--overlay-color);
-    opacity: var(--overlay-opacity);
-    cursor: pointer;
-    -webkit-backdrop-filter: blur(var(--overlay-backdrop-blur));
-    backdrop-filter: blur(var(--overlay-backdrop-blur));
+    background-color: transparent;
+    transition:
+      background-color var(--overlay-backdrop-duration, var(--motion-duration-standard)) var(--overlay-backdrop-ease, var(--motion-ease-standard)),
+      opacity var(--overlay-backdrop-duration, var(--motion-duration-standard)) var(--overlay-backdrop-ease, var(--motion-ease-standard)),
+      -webkit-backdrop-filter var(--overlay-backdrop-duration, var(--motion-duration-standard)) var(--overlay-backdrop-ease, var(--motion-ease-standard)),
+      backdrop-filter var(--overlay-backdrop-duration, var(--motion-duration-standard)) var(--overlay-backdrop-ease, var(--motion-ease-standard));
   }
 
   .cart-drawer__panel {
-    position: absolute;
-    z-index: 1;
-    inset-block: 0;
-    inset-inline-end: 0;
     display: flex;
-    width: min(var(--cart-drawer-width, 28.125rem), 100vw);
-    max-width: 100%;
     box-sizing: border-box;
     overflow: hidden;
     padding: 0;
-    border: var(--overlay-popover-border-width) solid var(--border-color);
-    border-radius: var(--drawer-radius);
-    background: var(--background-color);
-    color: var(--body-color);
-    box-shadow: var(--overlay-popover-shadow);
     pointer-events: auto;
-    transform: translateX(100%);
-    transition: transform var(--motion-duration-standard) var(--motion-ease-standard);
-  }
-
-  .cart-drawer.is-open {
-    pointer-events: auto;
-  }
-
-  .cart-drawer.is-open .cart-drawer__panel {
-    transform: translateX(0);
   }
 
   .cart-drawer__inner {
     display: flex;
     flex: 1 1 auto;
     flex-direction: column;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
     min-height: 0;
   }
 
@@ -432,8 +457,7 @@
     border-bottom: 1px solid var(--border-color);
   }
 
-  .cart-drawer__header .drawer__title,
-  .cart-drawer__header .cart-drawer__title {
+  .cart-drawer__header .drawer__title {
     margin: 0;
     color: var(--heading-color);
   }
@@ -449,9 +473,9 @@
     display: flex;
     flex: 1 1 auto;
     flex-direction: column;
+    width: 100%;
+    min-width: 0;
     min-height: 0;
-    overflow-y: auto;
-    overscroll-behavior: contain;
   }
 
   .cart-drawer__items {
@@ -549,12 +573,14 @@
   }
 
   .cart-drawer__recommendations {
+    min-width: 0;
     padding: 1.75rem var(--cart-drawer-padding) 2.125rem;
     border-top: 1px solid var(--border-color);
   }
 
   .cart-drawer__section-heading {
-    display: flex;
+    display: flex !important;
+    width: 100%;
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
@@ -562,64 +588,78 @@
   }
 
   .cart-drawer__section-heading h3 {
+    flex: 1 1 auto;
+    min-width: 0;
     margin: 0;
     color: var(--heading-color);
+    white-space: nowrap;
   }
 
-  .cart-drawer__recommendation-dots {
+  .cart-drawer__recommendation-pagination.swiper-pagination {
+    position: static;
+    inset: auto;
     display: flex;
+    width: auto;
+    min-height: 1.5rem;
+    align-items: center;
+    justify-content: flex-end;
     gap: 0.35rem;
+    margin-inline-start: auto;
+    flex: 0 0 auto;
+    transform: none;
   }
 
-  .cart-drawer__recommendation-dot {
+  .cart-drawer__recommendation-pagination .swiper-pagination-bullet {
     position: relative;
-    width: 1.5rem;
-    height: 1.5rem;
+    width: 0.625rem;
+    height: 0.625rem;
+    display: block;
+    flex: 0 0 0.625rem;
     padding: 0;
     border: 0;
     border-radius: 50%;
-    background: transparent;
-    color: var(--body-color);
+    appearance: none;
+    background: color-mix(in srgb, var(--body-color) 35%, transparent);
     cursor: pointer;
-    opacity: 0.45;
-  }
-
-  .cart-drawer__recommendation-dot::before {
-    position: absolute;
-    inset: 50% auto auto 50%;
-    width: 0.375rem;
-    height: 0.375rem;
-    border-radius: 50%;
-    background: currentColor;
-    content: '';
-    transform: translate(-50%, -50%);
-  }
-
-  .cart-drawer__recommendation-dot[aria-current='true'] {
     opacity: 1;
+    transition: background-color var(--motion-duration-fast) var(--motion-ease-standard), transform var(--motion-duration-fast) var(--motion-ease-standard);
+  }
+
+  .cart-drawer__recommendation-pagination .swiper-pagination-bullet-active {
+    background: var(--body-color);
+    transform: scale(1.15);
   }
 
   .cart-drawer__recommendation-list {
-    display: grid;
-    grid-auto-columns: 100%;
-    grid-auto-flow: column;
-    gap: 0;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: none;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    height: 4.875rem;
+    flex: 0 0 auto;
   }
 
-  .cart-drawer__recommendation-list::-webkit-scrollbar {
-    display: none;
+  .cart-drawer__recommendation-list > .swiper-wrapper {
+    display: flex;
+    width: 100%;
+    height: 100%;
+  }
+
+  .cart-drawer__recommendation-list > .swiper-wrapper > .swiper-slide {
+    display: grid;
+    flex: 0 0 100%;
+    width: 100%;
+    min-width: 0;
+    height: 100%;
+    align-items: center;
   }
 
   .cart-drawer__recommendation {
     display: grid;
     grid-template-columns: 4.875rem minmax(0, 1fr);
     gap: 1rem;
-    min-width: 100%;
+    width: 100%;
+    min-width: 0;
     align-items: center;
-    scroll-snap-align: start;
   }
 
   .cart-drawer__recommendation-media {
@@ -778,33 +818,14 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .cart-drawer {
-      transition: none;
-    }
-
     .cart-drawer__panel {
       transition-duration: 0.01ms;
     }
   }
 
-  @media (max-width: 989.98px) {
-    .cart-drawer__panel {
-      inset: auto 0 0;
-      width: 100%;
-      height: 85dvh;
-      max-height: 85dvh;
-      border-radius: var(--drawer-radius);
-      transform: translateY(100%);
-    }
-
-    .cart-drawer.is-open .cart-drawer__panel {
-      transform: translateY(0);
-    }
-  }
-
   @media (max-width: 767.98px) {
     .cart-drawer {
-      --cart-drawer-padding: var(--overlay-drawer-padding-mobile);
+      --cart-drawer-padding: var(--cart-drawer-padding-mobile, var(--overlay-drawer-content-padding-mobile, 1rem));
     }
 
     .cart-drawer__header {
@@ -831,23 +852,10 @@
 
   .cart-drawer,
   .cart-drawer.color-scheme {
-    --cart-drawer-motion-duration: 0.35s;
-    --cart-drawer-padding: var(--cart-drawer-padding-desktop, var(--overlay-drawer-padding-desktop));
+    --cart-drawer-padding: var(--cart-drawer-padding-desktop, var(--overlay-drawer-content-padding-desktop, 1.5rem));
+    --cart-drawer-inset: var(--cart-drawer-inset-desktop, 0px);
+    --overlay-drawer-inset: var(--cart-drawer-inset, 0px);
     color: var(--body-color);
-  }
-
-  .cart-drawer__panel {
-    width: min(var(--cart-drawer-width, 550px), 100vw);
-    max-width: 100%;
-    border: 0;
-    border-radius: var(--drawer-radius);
-    background: var(--background-color);
-    box-shadow: -14px 0 42px rgb(0 0 0 / 12%);
-    transform: translateX(100%);
-  }
-
-  .cart-drawer.is-open .cart-drawer__panel {
-    transform: translateX(0);
   }
 
   .cart-drawer__header {
@@ -855,19 +863,18 @@
     padding: 0 var(--cart-drawer-padding);
   }
 
-  .cart-drawer__header .cart-drawer__title {
+  .cart-drawer__header .drawer__title {
     max-width: 100%;
     margin: 0;
     color: var(--heading-color);
   }
 
-  .cart-drawer__title.heading-custom { font-size: var(--cart-drawer-custom-font-size, var(--font-heading-md)); }
-  .cart-drawer__title[data-title-limit='one'],
-  .cart-drawer__title[data-title-limit='two'],
-  .cart-drawer__title[data-title-limit='three'] { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; }
-  .cart-drawer__title[data-title-limit='one'] { -webkit-line-clamp: 1; }
-  .cart-drawer__title[data-title-limit='two'] { -webkit-line-clamp: 2; }
-  .cart-drawer__title[data-title-limit='three'] { -webkit-line-clamp: 3; }
+  .drawer__title[data-title-limit='one'],
+  .drawer__title[data-title-limit='two'],
+  .drawer__title[data-title-limit='three'] { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; }
+  .drawer__title[data-title-limit='one'] { -webkit-line-clamp: 1; }
+  .drawer__title[data-title-limit='two'] { -webkit-line-clamp: 2; }
+  .drawer__title[data-title-limit='three'] { -webkit-line-clamp: 3; }
 
   .cart-drawer__header-actions {
     display: flex;
@@ -901,8 +908,6 @@
 
   .cart-drawer__share:hover { background: color-mix(in srgb, var(--body-color) 7%, transparent); }
   .cart-drawer__share { font-size: 1.25rem; }
-
-  .cart-drawer__body { overflow-y: auto; }
 
   .cart-drawer__shipping-progress {
     display: grid;
@@ -955,9 +960,10 @@
   .cart-drawer__recommendations { padding: 1.75rem var(--cart-drawer-padding) 2.125rem; border-top: 1px solid var(--border-color); }
   .cart-drawer__section-heading { margin-bottom: 1.125rem; }
   .cart-drawer__section-title { margin: 0; color: var(--heading-color); }
-  .cart-drawer__recommendation-list { display: grid; grid-auto-columns: 100%; grid-auto-flow: column; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
-  .cart-drawer__recommendation-list::-webkit-scrollbar { display: none; }
-  .cart-drawer__recommendation { display: grid; grid-template-columns: 6.125rem minmax(0, 1fr) auto; gap: 1rem; min-width: 100%; align-items: center; scroll-snap-align: start; }
+  .cart-drawer__recommendation-list { width: 100%; max-width: 100%; overflow: hidden; height: 6.125rem; flex: 0 0 auto; }
+  .cart-drawer__recommendation-list > .swiper-wrapper { display: flex; width: 100%; height: 100%; }
+  .cart-drawer__recommendation-list > .swiper-wrapper > .swiper-slide { display: grid; flex: 0 0 100%; width: 100%; min-width: 0; height: 100%; align-items: center; }
+  .cart-drawer__recommendation { display: grid; grid-template-columns: 6.125rem minmax(0, 1fr) auto; gap: 1rem; width: 100%; min-width: 0; align-items: center; }
   .cart-drawer__recommendation-media { display: block; width: 6.125rem; aspect-ratio: 1; overflow: hidden; background: color-mix(in srgb, var(--background-color) 88%, var(--body-color)); }
   .cart-drawer__recommendation-media img { display: block; width: 100%; height: 100%; object-fit: cover; }
   .cart-drawer__recommendation-info { min-width: 0; }
@@ -1016,24 +1022,17 @@
   @keyframes cart-drawer-spin { to { transform: rotate(360deg); } }
 
   @media (prefers-reduced-motion: reduce) {
-    .cart-drawer,
-    .cart-drawer__panel,
+    .cart-drawer__backdrop,
+    .cart-drawer__order-options-backdrop,
     .cart-drawer__shipping-progress-track > span,
     .cart-drawer__accordion summary > span:last-child { transition: none; animation: none; }
   }
 
-  @media (min-width: 1024px) {
-    .cart-drawer__panel { inset: 0 0 0 auto; width: min(var(--cart-drawer-width, 550px), 100vw); }
-  }
-
-  @media (max-width: 1023.98px) {
-    .cart-drawer__panel { inset: 0 0 0 auto; width: 100%; max-width: 100%; height: 100dvh; min-height: 100%; max-height: none; border-radius: var(--drawer-radius); transform: translateX(100%); }
-    .cart-drawer.is-open .cart-drawer__panel { transform: translateX(0); }
-  }
-
   @media (max-width: 767.98px) {
-    .cart-drawer {
-      --cart-drawer-padding: var(--cart-drawer-padding-mobile, var(--overlay-drawer-padding-mobile));
+    .cart-drawer,
+    .cart-drawer.color-scheme {
+      --cart-drawer-padding: var(--cart-drawer-padding-mobile, var(--overlay-drawer-content-padding-mobile, 1rem));
+      --cart-drawer-inset: 0px;
       --cart-drawer-footer-padding: 1.25rem var(--cart-drawer-padding) 20px;
     }
     .cart-drawer__header { min-height: 74px; }
@@ -1041,45 +1040,13 @@
     .cart-drawer__item { grid-template-columns: 6rem minmax(0, 1fr) auto; min-height: 6rem; column-gap: 1rem; }
     .cart-drawer__item-media { width: 6rem; height: 6rem; }
     .cart-drawer__recommendations { padding-block: 20px 24px; }
+    .cart-drawer__recommendation-list { height: 4.875rem; }
     .cart-drawer__recommendation { grid-template-columns: 4.875rem minmax(0, 1fr) auto; }
     .cart-drawer__recommendation-media { width: 4.875rem; }
     .cart-drawer__recommendation-add { width: var(--button-height-mobile); min-width: var(--button-height-mobile); height: var(--button-height-mobile); min-height: var(--button-height-mobile); }
   }
 
   .cart-drawer__panel { z-index: 3; }
-
-  .cart-drawer__backdrop-pointer {
-    position: absolute;
-    z-index: 2;
-    top: var(--cart-drawer-pointer-y, -5rem);
-    left: var(--cart-drawer-pointer-x, -5rem);
-    display: grid;
-    width: 3.25rem;
-    height: 3.25rem;
-    place-items: center;
-    border: 1px solid color-mix(in srgb, var(--background-color) 42%, transparent);
-    border-radius: 50%;
-    background: var(--background-color);
-    color: var(--heading-color);
-    opacity: 0;
-    pointer-events: none;
-    transform: translate(-50%, -50%) scale(0.82);
-    transition: opacity 150ms ease, transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
-  }
-
-  .cart-drawer__backdrop-pointer::before,
-  .cart-drawer__backdrop-pointer::after {
-    position: absolute;
-    width: 1.1rem;
-    height: 1px;
-    border-radius: 999px;
-    background: currentColor;
-    content: '';
-  }
-
-  .cart-drawer__backdrop-pointer::before { transform: rotate(45deg); }
-  .cart-drawer__backdrop-pointer::after { transform: rotate(-45deg); }
-  .cart-drawer__backdrop-pointer.is-visible { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 
   .cart-drawer__shipping-progress {
     display: grid;
@@ -1093,29 +1060,32 @@
   }
 
   .cart-drawer__shipping-progress-copy { display: flex; min-width: 0; align-items: flex-start; gap: 0.875rem; }
-  .cart-drawer__shipping-progress-icon { --cart-drawer-shipping-icon-size: 3.2rem; position: relative; display: grid; width: var(--cart-drawer-shipping-icon-size); height: var(--cart-drawer-shipping-icon-size); flex: 0 0 var(--cart-drawer-shipping-icon-size); place-items: center; padding: 0.6rem; border-radius: 50%; background: color-mix(in srgb, var(--body-color) 12%, var(--background-color)); }
-  .cart-drawer__shipping-progress-icon svg { width: 100%; height: 100%; }
+  .cart-drawer__shipping-progress-icon { --cart-drawer-shipping-icon-size: 3.8rem; position: relative; display: grid; width: var(--cart-drawer-shipping-icon-size); height: var(--cart-drawer-shipping-icon-size); flex: 0 0 var(--cart-drawer-shipping-icon-size); place-items: center; padding: 0.7rem; border-radius: 50%; background: color-mix(in srgb, var(--body-color) 12%, var(--background-color)); }
+  .cart-drawer__shipping-progress-icon > svg:first-child { width: 100%; height: 100%; }
+  .cart-drawer__shipping-progress-success-icon { position: absolute; top: -0.3rem; right: -0.3rem; width: 1.35rem; height: 1.35rem; color: var(--cart-drawer-shipping-success-color); visibility: hidden; }
   .cart-drawer__shipping-progress-details { display: grid; width: 100%; min-width: 0; gap: 0.75rem; }
-  .cart-drawer__shipping-progress p { margin: 0; color: var(--heading-color); line-height: 1.35; }
+  .cart-drawer__shipping-progress p { margin: 0; color: var(--heading-color); font-weight: 500; line-height: 1.35; }
   .cart-drawer__shipping-progress-track { height: 0.3rem; border-radius: 0; background: color-mix(in srgb, var(--body-color) 14%, transparent); }
   .cart-drawer__shipping-progress-track > span { border-radius: 0; }
   .cart-drawer__shipping-progress-goal { display: grid; gap: 0.35rem; margin: 0 !important; color: var(--body-color) !important; text-align: end; white-space: nowrap; }
   .cart-drawer__shipping-progress-goal > span:last-child { color: color-mix(in srgb, var(--body-color) 66%, transparent); }
   .cart-drawer__shipping-progress[data-unlocked='true'] .cart-drawer__shipping-progress-track > span { background: var(--cart-drawer-shipping-success-color); }
   .cart-drawer__shipping-progress[data-unlocked='true'] [data-cart-drawer-shipping-message],
-  .cart-drawer__shipping-progress[data-unlocked='true'] .cart-drawer__shipping-progress-goal > span:last-child { color: var(--cart-drawer-shipping-success-color); font-weight: 600; }
+  .cart-drawer__shipping-progress[data-unlocked='true'] .cart-drawer__shipping-progress-goal > span:last-child { color: var(--cart-drawer-shipping-success-color); font-weight: 500; }
   .cart-drawer__shipping-progress[data-unlocked='true'] .cart-drawer__shipping-progress-icon { border: 1px solid color-mix(in srgb, var(--cart-drawer-shipping-success-color) 24%, transparent); background: color-mix(in srgb, var(--cart-drawer-shipping-success-color) 18%, var(--background-color)); }
-  .cart-drawer__shipping-progress[data-unlocked='true'] .cart-drawer__shipping-progress-icon::before { position: absolute; top: -0.3rem; right: -0.3rem; width: 1.125rem; height: 1.125rem; border-radius: 50%; background: var(--cart-drawer-shipping-success-color); content: ''; }
-  .cart-drawer__shipping-progress[data-unlocked='true'] .cart-drawer__shipping-progress-icon::after { position: absolute; z-index: 1; top: 0; right: -0.05rem; width: 0.45rem; height: 0.25rem; border-bottom: 2px solid var(--background-color); border-left: 2px solid var(--background-color); content: ''; transform: rotate(-45deg); }
+  .cart-drawer__shipping-progress[data-unlocked='true'] .cart-drawer__shipping-progress-success-icon { visibility: visible; }
 
   .cart-drawer__promotion {
     display: flex;
+    flex: 0 0 auto;
     min-height: 3.75rem;
     align-items: center;
     gap: 0.75rem;
     margin: 0 var(--cart-drawer-padding);
     border-bottom: 1px solid var(--border-color);
   }
+
+  .cart-drawer__shipping-progress + .cart-drawer__promotion { margin-block-start: 0.75rem; }
 
   .cart-drawer__promotion-copy { display: inline-flex; min-width: 0; flex: 1 1 auto; align-items: center; gap: 0.7rem; color: var(--body-color); }
   .cart-drawer__promotion-copy svg { width: var(--icon-size-medium); height: var(--icon-size-medium); flex: 0 0 auto; }
@@ -1172,12 +1142,7 @@
   .cart-drawer__checkout { display: inline-flex; width: 100%; min-height: 3.75rem; align-items: center; justify-content: center; margin: 0; padding-inline: 1rem; text-decoration: none; }
   .cart-drawer__checkout { gap: 0.6rem; }
 
-  @media (hover: hover) and (pointer: fine) {
-    .cart-drawer.is-open:not(.is-closing) .cart-drawer__backdrop { cursor: none; }
-  }
-
   @media (max-width: 767.98px) {
-    .cart-drawer__backdrop-pointer { display: none; }
     .cart-drawer__shipping-progress { margin: 0.75rem var(--cart-drawer-padding) 0; padding: 1rem; }
     .cart-drawer__promotion { min-height: 3.4rem; }
     .cart-drawer__order-options-actions { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -1294,12 +1259,16 @@
     height: 100%;
     padding: 0;
     border: 0;
-    background: var(--overlay-color);
-    -webkit-backdrop-filter: blur(var(--overlay-backdrop-blur));
-    backdrop-filter: blur(var(--overlay-backdrop-blur));
-    opacity: 0;
+    background-color: transparent;
+    -webkit-backdrop-filter: blur(0);
+    backdrop-filter: blur(0);
     pointer-events: none;
-    transition: opacity 240ms ease, visibility 0s linear 240ms;
+    opacity: 1;
+    transition:
+      background-color var(--motion-duration-standard) var(--motion-ease-standard),
+      opacity var(--motion-duration-standard) var(--motion-ease-standard),
+      backdrop-filter var(--motion-duration-standard) var(--motion-ease-standard),
+      visibility 0s linear var(--motion-duration-standard);
     visibility: hidden;
   }
 
@@ -1310,20 +1279,26 @@
     display: flex;
     max-height: min(34rem, calc(100% - 4rem));
     flex-direction: column;
-    overflow: auto;
     padding-bottom: 1.8rem;
     border-top: 1px solid var(--border-color);
-    border-radius: var(--bottom-sheet-radius) var(--bottom-sheet-radius) 0 0;
+
     background: var(--background-color);
     box-shadow: 0 -12px 36px rgb(0 0 0 / 14%);
     opacity: 0;
     pointer-events: none;
     transform: translateY(100%);
-    transition: transform 360ms cubic-bezier(0.22, 1, 0.36, 1), opacity 280ms ease, visibility 0s linear 360ms;
+    transition: transform var(--motion-duration-standard) var(--motion-ease-standard), opacity var(--motion-duration-standard) var(--motion-ease-standard), visibility 0s linear var(--motion-duration-standard);
     visibility: hidden;
   }
 
-  .cart-drawer.is-order-options-open .cart-drawer__order-options-backdrop { opacity: var(--overlay-opacity); pointer-events: auto; transition-delay: 0s; visibility: visible; }
+  .cart-drawer.is-order-options-open .cart-drawer__order-options-backdrop {
+    background-color: var(--overlay-backdrop-color);
+    -webkit-backdrop-filter: blur(var(--overlay-backdrop-blur));
+    backdrop-filter: blur(var(--overlay-backdrop-blur));
+    pointer-events: auto;
+    transition-delay: 0s;
+    visibility: visible;
+  }
   .cart-drawer.is-order-options-open .cart-drawer__order-options-panel { opacity: 1; pointer-events: auto; transform: translateY(0); transition-delay: 0s; visibility: visible; }
   .cart-drawer__order-options-header { position: relative; display: flex; min-height: 4.75rem; align-items: center; justify-content: space-between; gap: 1rem; padding: 0 var(--cart-drawer-padding); border-bottom: 1px solid var(--border-color); cursor: grab; touch-action: none; user-select: none; }
   .cart-drawer__order-options-header h3 { margin: 0; color: var(--heading-color); }
@@ -1383,32 +1358,6 @@
       "id": "title",
       "label": "Title",
       "default": "Cart"
-    },
-    {
-      "type": "select",
-      "id": "title_size",
-      "label": "t:labels.heading_size",
-      "options": [
-        { "value": "display", "label": "t:options.heading_size.display" },
-        { "value": "xl", "label": "t:options.heading_size.xl" },
-        { "value": "lg", "label": "t:options.heading_size.lg" },
-        { "value": "md", "label": "t:options.heading_size.md" },
-        { "value": "sm", "label": "t:options.heading_size.sm" },
-        { "value": "xs", "label": "t:options.heading_size.xs" },
-        { "value": "custom", "label": "t:options.heading_size.custom" }
-      ],
-      "default": "md"
-    },
-    {
-      "type": "range",
-      "id": "custom_title_size",
-      "label": "Custom title size",
-      "min": 10,
-      "max": 64,
-      "step": 1,
-      "unit": "px",
-      "default": 24,
-      "visible_if": "{{ section.settings.title_size == 'custom' }}"
     },
     {
       "type": "checkbox",
@@ -1479,12 +1428,6 @@
       "default": true
     },
     {
-      "type": "checkbox",
-      "id": "enable_padding_mobile",
-      "label": "Enable padding on mobile",
-      "default": true
-    },
-    {
       "type": "header",
       "content": "Free shipping"
     },
@@ -1507,6 +1450,7 @@
     },
     {
       "type": "color",
+      "alpha": true,
       "id": "progress_bar_color",
       "label": "Progress bar color",
       "default": "#d92d2d",
@@ -1514,6 +1458,7 @@
     },
     {
       "type": "color",
+      "alpha": true,
       "id": "free_shipping_success_color",
       "label": "Success color",
       "default": "#5d874f",

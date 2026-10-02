@@ -7,7 +7,8 @@ class ProductBuyButtons extends HTMLElement {
     this.sectionRoot =
       this.closest('[data-product-information]') || this.closest('.shopify-section') || this.parentElement;
     this.form = this.querySelector('[data-product-form]');
-    this.variantInput = this.form?.querySelector('[data-variant-id]');
+    this.variantInput = this.form?.querySelector('[data-variant-id-input]')
+      || this.form?.querySelector('[data-variant-id]:not([data-option-control])');
     this.addButton = this.form?.querySelector('[data-add-to-cart-button]');
     this.paymentWrapper = this.form?.querySelector('[data-accelerated-checkout-wrapper]');
     this.quantityInput = this.form?.querySelector('[data-quantity-input]');
@@ -28,30 +29,32 @@ class ProductBuyButtons extends HTMLElement {
     this.backInStockDialog = this.querySelector('[data-back-in-stock-dialog]');
     this.backInStockForm = this.querySelector('[data-back-in-stock-form]');
     this.backInStockContext = this.backInStockForm?.querySelector('[data-back-in-stock-context]');
-    this.backInStockOpener = null;
 
     this.handleVariantChange = this.handleVariantChange.bind(this);
     this.handleClick = this.handleClick.bind(this);
     this.handleInput = this.handleInput.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleDialogCancel = this.handleDialogCancel.bind(this);
-    this.handleDialogClose = this.handleDialogClose.bind(this);
 
     this.sectionRoot?.addEventListener('variant:change', this.handleVariantChange, { signal: this.signal });
     this.sectionRoot?.addEventListener('input', this.handleInput, { signal: this.signal });
     this.sectionRoot?.addEventListener('change', this.handleChange, { signal: this.signal });
     this.addEventListener('click', this.handleClick, { signal: this.signal });
     this.form?.addEventListener('submit', this.handleSubmit, { signal: this.signal });
-    this.backInStockDialog?.addEventListener('cancel', this.handleDialogCancel, { signal: this.signal });
-    this.backInStockDialog?.addEventListener('close', this.handleDialogClose, { signal: this.signal });
 
     this.syncGiftCardRecipient();
     this.normalizeQuantity();
+    const variantPicker = this.sectionRoot?.querySelector('[data-product-variant-picker]');
+    const pickerVariantId = variantPicker?.dataset.currentVariantId || '';
+    const pickerVariant = variantPicker?.findVariantById?.(pickerVariantId) || null;
+    const initialVariantId = pickerVariantId || this.dataset.currentVariantId || this.variantInput?.value || '';
+    const initialVariantAvailable = variantPicker
+      ? variantPicker.dataset.currentVariantAvailable === 'true'
+      : this.dataset.variantAvailable === 'true';
     this.syncPurchaseState(
-      this.dataset.currentVariantId || this.variantInput?.value || '',
-      this.dataset.variantAvailable === 'true',
-      null,
+      initialVariantId,
+      initialVariantAvailable,
+      pickerVariant,
     );
 
     const backInStockFormState = this.backInStockForm?.querySelector('[data-back-in-stock-form-state]')?.dataset.backInStockFormState
@@ -72,7 +75,7 @@ class ProductBuyButtons extends HTMLElement {
       this.sectionRoot = null;
       this.form = null;
       this.currentQuantityRule = null;
-      this.backInStockOpener = null;
+      window.ThemeOverlay.get(this.backInStockDialog)?.destroy();
     });
   }
 
@@ -93,10 +96,16 @@ class ProductBuyButtons extends HTMLElement {
     this.dataset.backInStockVariantId = variantId;
     this.dataset.variantAvailable = String(isAvailable);
 
-    if (this.variantInput) {
-      this.variantInput.value = variantId;
-      this.variantInput.setAttribute('value', variantId);
-    }
+    const variantInputs = [
+      this.variantInput,
+      ...Array.from(this.form?.querySelectorAll('[data-variant-id-input]') || []),
+      ...Array.from(this.form?.querySelectorAll('[data-variant-id]:not([data-option-control])') || []),
+    ].filter((input, index, inputs) => input && inputs.indexOf(input) === index);
+
+    variantInputs.forEach((input) => {
+      input.value = variantId;
+      input.setAttribute('value', variantId);
+    });
     if (this.form) {
       this.form.dataset.currentVariantId = variantId;
       this.form.dataset.variantAvailable = String(isAvailable);
@@ -133,13 +142,17 @@ class ProductBuyButtons extends HTMLElement {
     const label = this.addButton?.querySelector('.btn__text');
     if (!label) return;
 
+    const showPrice = this.form?.dataset.addToCartShowPrice !== 'false'
+      && this.addButton?.closest('[data-add-to-cart-show-price]')?.dataset.addToCartShowPrice !== 'false';
     let nextLabel = this.dataset.unavailableLabel || '';
     if (variantId && !isAvailable) {
       nextLabel = this.dataset.soldOutLabel || nextLabel;
     } else if (variantId && isAvailable) {
-      const template = Array.from(this.form?.querySelectorAll('[data-add-to-cart-label-template]') || []).find(
-        (candidate) => String(candidate.dataset.addToCartLabelTemplate) === String(variantId),
-      );
+      const template = showPrice
+        ? Array.from(this.form?.querySelectorAll('[data-add-to-cart-label-template]') || []).find(
+          (candidate) => String(candidate.dataset.addToCartLabelTemplate) === String(variantId),
+        )
+        : null;
       nextLabel = template?.content.textContent.trim() || this.dataset.addToCartLabel || nextLabel;
     }
 
@@ -225,9 +238,9 @@ class ProductBuyButtons extends HTMLElement {
 
     const value = Number(this.quantityInput.value || this.quantityInput.min || 1);
     const min = Number(this.quantityInput.min || 1);
-    const max = Number(this.quantityInput.max);
+    const max = this.quantityInput.max === '' ? null : Number(this.quantityInput.max);
     if (this.quantityDecrease) this.quantityDecrease.disabled = value <= min;
-    if (this.quantityIncrease) this.quantityIncrease.disabled = Number.isFinite(max) && value >= max;
+    if (this.quantityIncrease) this.quantityIncrease.disabled = max !== null && Number.isFinite(max) && value >= max;
   }
 
   syncGiftCardRecipient() {
@@ -320,53 +333,15 @@ class ProductBuyButtons extends HTMLElement {
       return;
     }
 
-    if (event.target === this.backInStockDialog) this.closeBackInStock(true);
+
   }
 
-  openBackInStock(restoreFocus = true) {
-    const dialog = this.backInStockDialog;
-    if (!dialog || dialog.open) return;
-
-    this.backInStockOpener = restoreFocus ? this.backInStockTrigger : null;
-    this.backInStockTrigger?.setAttribute('aria-expanded', 'true');
-    try {
-      if (typeof dialog.showModal === 'function') dialog.showModal();
-      else dialog.setAttribute('open', '');
-    } catch (error) {
-      dialog.setAttribute('open', '');
-    }
-    window.requestAnimationFrame(() => {
-      dialog.querySelector('input:not([type="hidden"]):not(:disabled), textarea:not(:disabled), select:not(:disabled)')?.focus({ preventScroll: true });
-    });
+  openBackInStock(fromTrigger = true) {
+    window.ThemeOverlay.get(this.backInStockDialog)?.open({ opener: fromTrigger ? this.backInStockTrigger : null });
   }
 
   closeBackInStock(restoreFocus = true) {
-    const dialog = this.backInStockDialog;
-    if (!dialog) return;
-
-    if (!restoreFocus) this.backInStockOpener = null;
-    if (typeof dialog.close === 'function' && dialog.open) dialog.close();
-    else {
-      dialog.removeAttribute('open');
-      this.handleDialogClose();
-    }
-  }
-
-  handleDialogCancel(event) {
-    event.preventDefault();
-    this.closeBackInStock(true);
-  }
-
-  handleDialogClose() {
-    this.backInStockTrigger?.setAttribute('aria-expanded', 'false');
-    if (
-      this.backInStockOpener?.isConnected
-      && !this.backInStockOpener.hidden
-      && this.backInStockOpener.getAttribute('aria-hidden') !== 'true'
-    ) {
-      this.backInStockOpener.focus({ preventScroll: true });
-    }
-    this.backInStockOpener = null;
+    window.ThemeOverlay.get(this.backInStockDialog)?.close({ restoreFocus });
   }
 
   updateBackInStockContext(variantId, variant) {

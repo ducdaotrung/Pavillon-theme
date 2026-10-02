@@ -4,6 +4,7 @@
 
   The parent layout owns the block width and alignment. This block owns the
   selected menu, heading presentation, link list and mobile disclosure state.
+  Empty menus show the same non-interactive placeholder in the editor and storefront.
 
   @example
   {% content_for 'block', type: 'menu', id: 'menu' %}
@@ -14,6 +15,9 @@
   assign selected_menu_handle = block.settings.menu
   if block.settings.menu.handle != blank
     assign selected_menu_handle = block.settings.menu.handle
+  endif
+  if selected_menu_handle == blank
+    assign selected_menu_handle = 'main-menu'
   endif
   if selected_menu.links == blank and selected_menu_handle != blank
     assign selected_menu = linklists[selected_menu_handle]
@@ -35,6 +39,10 @@
   unless heading_size == 'display' or heading_size == 'xl' or heading_size == 'lg' or heading_size == 'md' or heading_size == 'sm' or heading_size == 'xs' or heading_size == 'custom'
     assign heading_size = 'lg'
   endunless
+  assign heading_custom_size = block.settings.custom_heading_size | default: 24 | plus: 0
+  if heading_custom_size < 10 or heading_custom_size > 100
+    assign heading_custom_size = 24
+  endif
 
   assign heading_tag = block.settings.html_tag | default: 'h2'
   unless heading_tag == 'div' or heading_tag == 'h1' or heading_tag == 'h2' or heading_tag == 'h3' or heading_tag == 'h4' or heading_tag == 'h5' or heading_tag == 'h6'
@@ -86,6 +94,7 @@
 %}
 
 {% capture menu_style %}
+  {% if heading_size == 'custom' %}--menu-block-heading-custom-size: {{ heading_custom_size }}px;{% endif %}
   {% if heading_gap != 16 %}--menu-block-heading-gap: {{ heading_gap }}px;{% endif %}
   {% if menu_gap != 8 %}--menu-block-menu-gap: {{ menu_gap }}px;{% endif %}
   {% if heading_color != blank %}--menu-block-heading-color: {{ heading_color | escape }};{% endif %}
@@ -117,7 +126,7 @@
         </li>
       {% endfor %}
     </ul>
-  {% elsif request.design_mode %}
+  {% else %}
     <p class="menu-block__empty">{{ 'accessibility.footer_menu' | t }}</p>
   {% endif %}
 {% endcapture %}
@@ -141,33 +150,35 @@
 
 {% assign menu_content_id = 'MenuContent-' | append: section.id | append: '-' | append: block.id %}
 
-{% if has_menu or request.design_mode %}
-  <nav
-    class="{{ menu_class }}"
-    aria-label="{{ heading_label | escape }}"
-    data-collapse-mobile="{{ collapse_menu_on_mobile }}"
-    {% if menu_style != blank %}style="{{ menu_style }}"{% endif %}
-    {{ block.shopify_attributes }}
-  >
-    {% if collapse_menu_on_mobile %}
-      {% render 'accordion-details',
-        class: 'menu-block__details',
-        summary: menu_summary,
-        content: menu_markup,
-        content_id: menu_content_id,
-        summary_class: 'menu-block__summary',
-        content_class: 'menu-block__content',
-        content_inner_class: 'menu-block__content-inner',
-        mobile_only: true
-      %}
-    {% else %}
-      {{ heading_markup }}
-      <div class="menu-block__content">
-        <div class="menu-block__content-inner">{{ menu_markup }}</div>
-      </div>
-    {% endif %}
-  </nav>
-{% endif %}
+<nav
+  class="{{ menu_class }}"
+  aria-label="{{ heading_label | escape }}"
+  data-collapse-mobile="{{ collapse_menu_on_mobile }}"
+  {% if menu_style != blank %}style="{{ menu_style }}"{% endif %}
+  {{ block.shopify_attributes }}
+>
+  {% if collapse_menu_on_mobile %}
+    {% render 'accordion-details',
+      class: 'menu-block__details',
+      summary: menu_summary,
+      content: menu_markup,
+      content_id: menu_content_id,
+      summary_class: 'menu-block__summary',
+      content_class: 'menu-block__content',
+      content_inner_class: 'menu-block__content-inner',
+      mobile_only: true
+    %}
+  {% else %}
+    {{ heading_markup }}
+    <div class="menu-block__content">
+      <div class="menu-block__content-inner">{{ menu_markup }}</div>
+    </div>
+  {% endif %}
+</nav>
+
+{% stylesheet %}
+  .menu-block__heading.heading-custom { font-size: var(--menu-block-heading-custom-size, var(--font-heading-custom)); }
+{% endstylesheet %}
 
 {% schema %}
 {
@@ -203,7 +214,8 @@
         { "value": "chevron", "label": "t:options.menu_icon.chevron" },
         { "value": "plus", "label": "t:options.menu_icon.plus" }
       ],
-      "default": "chevron"
+      "default": "chevron",
+      "visible_if": "{{ block.settings.collapse_menu_on_mobile }}"
     },
     {
       "type": "header",
@@ -249,6 +261,17 @@
       "default": "lg"
     },
     {
+      "type": "range",
+      "id": "custom_heading_size",
+      "label": "Custom size",
+      "min": 10,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 24,
+      "visible_if": "{{ block.settings.heading_size == 'custom' }}"
+    },
+    {
       "type": "select",
       "id": "html_tag",
       "label": "t:labels.html_tag",
@@ -266,6 +289,7 @@
     },
     {
       "type": "color",
+      "alpha": true,
       "id": "heading_color",
       "label": "t:labels.text_color",
       "info": "t:info.heading_text_color"
@@ -290,6 +314,7 @@
     },
     {
       "type": "color",
+      "alpha": true,
       "id": "menu_color",
       "label": "t:labels.text_color"
     }

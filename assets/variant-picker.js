@@ -7,7 +7,9 @@ class VariantPicker extends HTMLElement {
     this.sectionRoot =
       this.closest('[data-product-information]') || this.closest('.shopify-section') || this.parentElement;
     this.variants = this.readVariants();
-    this.variantIdInput = this.querySelector('[data-variant-id]');
+    this.variantIdInput = this.querySelector('[data-variant-id-input]')
+      || this.querySelector('[data-variant-id]:not([data-option-control])');
+    this.sizeChartDialogElement = this.querySelector('[data-size-chart-dialog]');
     this.initialVariantId = String(this.dataset.currentVariantId || this.variantIdInput?.value || '');
     this.sizeChartOpener = null;
 
@@ -16,17 +18,15 @@ class VariantPicker extends HTMLElement {
     this.handleKeydown = this.handleKeydown.bind(this);
     this.handlePopState = this.handlePopState.bind(this);
     this.handleExternalVariantChange = this.handleExternalVariantChange.bind(this);
-    this.handleSizeChartClose = this.handleSizeChartClose.bind(this);
-    this.handleSizeChartCancel = this.handleSizeChartCancel.bind(this);
 
     const eventOptions = { signal: this.signal };
     this.addEventListener('change', this.handleChange, eventOptions);
     this.addEventListener('click', this.handleClick, eventOptions);
     this.addEventListener('keydown', this.handleKeydown, eventOptions);
     window.addEventListener('popstate', this.handlePopState, eventOptions);
-    this.sectionRoot?.addEventListener('variant:change', this.handleExternalVariantChange, eventOptions);
-    this.sizeChartDialog?.addEventListener('close', this.handleSizeChartClose, eventOptions);
-    this.sizeChartDialog?.addEventListener('cancel', this.handleSizeChartCancel, eventOptions);
+    if (this.dataset.syncExternalVariants !== 'false') {
+      this.sectionRoot?.addEventListener('variant:change', this.handleExternalVariantChange, eventOptions);
+    }
 
     this.applyUrlVariant();
     this.sync({ source: 'initial' });
@@ -39,12 +39,12 @@ class VariantPicker extends HTMLElement {
       this.abortController?.abort();
       this.abortController = null;
       this.signal = null;
-      this.sizeChartOpener = null;
+      window.ThemeOverlay.get(this.sizeChartDialog)?.destroy();
     });
   }
 
   get sizeChartDialog() {
-    return this.querySelector('[data-size-chart-dialog]');
+    return this.sizeChartDialogElement || this.querySelector('[data-size-chart-dialog]');
   }
 
   readVariants() {
@@ -178,6 +178,11 @@ class VariantPicker extends HTMLElement {
         status.hidden = state === 'available';
       }
     });
+
+    this.optionGroups().forEach((group, optionIndex) => {
+      const selectedValue = group.querySelector('[data-variant-selected-value]');
+      if (selectedValue) selectedValue.textContent = selectedOptions[optionIndex] ? `: ${selectedOptions[optionIndex]}` : '';
+    });
   }
 
   productForm() {
@@ -192,6 +197,12 @@ class VariantPicker extends HTMLElement {
       document.getElementById(this.dataset.productFormId) ||
       this.closest('form')
     );
+  }
+
+  productFormController(productForm = this.productForm()) {
+    return productForm?.closest('[data-product-buy-buttons]')
+      || this.sectionRoot?.querySelector('[data-product-buy-buttons]')
+      || null;
   }
 
   updateQuantityInput(variant, productForm) {
@@ -237,16 +248,30 @@ class VariantPicker extends HTMLElement {
     const variantId = variant?.id ? String(variant.id) : '';
     const isAvailable = Boolean(variant?.available);
     const productForm = this.productForm();
+    const productFormController = this.productFormController(productForm);
 
-    if (this.variantIdInput) {
-      this.variantIdInput.value = variantId;
-      this.variantIdInput.setAttribute('value', variantId);
-    }
+    const variantInputs = [
+      this.variantIdInput,
+      ...this.querySelectorAll('[data-variant-id-input]'),
+      ...Array.from(productForm?.querySelectorAll('[data-variant-id-input]') || []),
+    ].filter((input, index, inputs) => input && inputs.indexOf(input) === index);
 
-    productForm?.querySelectorAll('[data-variant-id]').forEach((input) => {
+    variantInputs.forEach((input) => {
       input.value = variantId;
       input.setAttribute('value', variantId);
     });
+
+    this.dataset.currentVariantId = variantId;
+    this.dataset.currentVariantAvailable = String(isAvailable);
+
+    // Keep every cart form input synchronized even when the modern buy-button
+    // controller has not upgraded yet. This also makes the initial lifecycle
+    // deterministic when the picker script is defined before the form script.
+    // Product buy buttons owns the modern product form. The picker only keeps
+    // its own state in sync and emits the shared variant:change contract;
+    // legacy product forms still use the fallback branch below.
+    if (productFormController) return;
+
     if (productForm) {
       productForm.dataset.currentVariantId = variantId;
       productForm.dataset.variantAvailable = String(isAvailable);
@@ -258,17 +283,8 @@ class VariantPicker extends HTMLElement {
       button.dataset.variantAvailable = String(isAvailable);
     });
 
-    const buyButtons =
-      productForm?.closest('[data-product-buy-buttons]') ||
-      this.sectionRoot?.querySelector('[data-product-buy-buttons]');
-    if (buyButtons) {
-      buyButtons.dataset.backInStockVariantId = variantId;
-      buyButtons.dataset.variantAvailable = String(isAvailable);
-    }
-
     this.updateQuantityInput(variant, productForm);
     this.updateAddToCartLabel(productForm, variant);
-    this.dataset.currentVariantId = variantId;
   }
 
   updateAddToCartLabel(productForm, variant) {
@@ -298,54 +314,56 @@ class VariantPicker extends HTMLElement {
     }
   }
 
-  priceContainer() {
+  priceContainers() {
     const sectionId = this.dataset.sectionId;
 
-    return Array.from(this.sectionRoot?.querySelectorAll('[data-product-price-container]') || []).find(
+    return Array.from(this.sectionRoot?.querySelectorAll('[data-product-price-container]') || []).filter(
       (container) => container.dataset.sectionId === sectionId,
     );
   }
 
   updatePrice(variant) {
-    const container = this.priceContainer();
-    const currentPrice = container?.querySelector('[data-price-component]');
+    this.priceContainers().forEach((container) => {
+      const currentPrice = container?.querySelector('[data-price-component]');
 
-    if (!container || !currentPrice) {
-      return;
-    }
+      if (!container || !currentPrice) {
+        return;
+      }
 
-    const variantId = variant?.id ? String(variant.id) : '';
-    const template = Array.from(container.querySelectorAll('[data-variant-price-template]')).find(
-      (priceTemplate) => priceTemplate.dataset.variantPriceTemplate === variantId,
-    );
-    const nextPrice = template?.content.querySelector('[data-price-component]');
+      const variantId = variant?.id ? String(variant.id) : '';
+      const template = Array.from(container.querySelectorAll('[data-variant-price-template]')).find(
+        (priceTemplate) => priceTemplate.dataset.variantPriceTemplate === variantId,
+      );
+      const nextPrice = template?.content.querySelector('[data-price-component]');
 
-    if (!nextPrice) {
-      currentPrice.hidden = true;
-      currentPrice.setAttribute('aria-hidden', 'true');
-      return;
-    }
+      if (!nextPrice) {
+        currentPrice.hidden = true;
+        currentPrice.setAttribute('aria-hidden', 'true');
+        return;
+      }
 
-    currentPrice.replaceWith(nextPrice.cloneNode(true));
+      currentPrice.replaceWith(nextPrice.cloneNode(true));
+    });
   }
 
   updateSaleBadge(variant) {
-    const price = this.priceContainer();
-    const container = price?.querySelector('[data-variant-sale-badge-container]');
+    this.priceContainers().forEach((price) => {
+      const container = price?.querySelector('[data-variant-sale-badge-container]');
 
-    if (!price || !container) {
-      return;
-    }
+      if (!price || !container) {
+        return;
+      }
 
-    const variantId = variant?.id ? String(variant.id) : '';
-    const template = Array.from(price.querySelectorAll('[data-variant-sale-badge-template]')).find(
-      (badgeTemplate) => badgeTemplate.dataset.variantSaleBadgeTemplate === variantId,
-    );
+      const variantId = variant?.id ? String(variant.id) : '';
+      const template = Array.from(price.querySelectorAll('[data-variant-sale-badge-template]')).find(
+        (badgeTemplate) => badgeTemplate.dataset.variantSaleBadgeTemplate === variantId,
+      );
 
-    container.replaceChildren(template?.content.cloneNode(true) || document.createDocumentFragment());
+      container.replaceChildren(template?.content.cloneNode(true) || document.createDocumentFragment());
+    });
   }
 
-  updateMedia(variantId) {
+  updateLegacyMedia(variantId) {
     const galleryId = this.dataset.mediaGalleryId;
     const gallery = galleryId
       ? Array.from(this.sectionRoot?.querySelectorAll('[data-product-media-gallery]') || []).find(
@@ -353,6 +371,11 @@ class VariantPicker extends HTMLElement {
         )
       : null;
     const mediaItems = gallery ? Array.from(gallery.querySelectorAll('[data-product-media]')) : [];
+
+    // ProductMediaGallery is the single owner of modern media filtering and
+    // featured-media selection. Keep this fallback only for the legacy
+    // product section, which renders a plain gallery element.
+    if (gallery?.matches('product-media-gallery')) return;
 
     if (!mediaItems.length) {
       return;
@@ -393,6 +416,7 @@ class VariantPicker extends HTMLElement {
   }
 
   updateUrl(variantId) {
+    if (this.sectionRoot?.hasAttribute('data-featured-product')) return;
     if (window.Shopify?.designMode || !window.history?.replaceState) return;
 
     const url = new URL(window.location.href);
@@ -413,10 +437,12 @@ class VariantPicker extends HTMLElement {
   }
 
   applyUrlVariant() {
+    if (this.sectionRoot?.hasAttribute('data-featured-product')) return;
     if (window.Shopify?.designMode) return;
 
     const url = new URL(window.location.href);
     const requestedVariantId = url.searchParams.get('variant');
+    if (requestedVariantId && this.dataset.ignoreUrlVariant === 'true') return;
     const targetVariant = requestedVariantId
       ? this.findVariantById(requestedVariantId)
       : this.findVariantById(this.initialVariantId);
@@ -458,7 +484,7 @@ class VariantPicker extends HTMLElement {
     this.updateStatus(variant);
     this.updatePrice(variant);
     this.updateSaleBadge(variant);
-    this.updateMedia(variant?.id || '');
+    this.updateLegacyMedia(variant?.id || '');
     if (updateUrl) this.updateUrl(variant?.id || '');
 
     this.dispatchEvent(
@@ -480,7 +506,7 @@ class VariantPicker extends HTMLElement {
       return;
     }
 
-    this.sync({ updateUrl: true, source: 'change' });
+    this.sync({ updateUrl: this.dataset.updateUrlOnChange !== 'false', source: 'change' });
   }
 
   handleClick(event) {
@@ -498,9 +524,7 @@ class VariantPicker extends HTMLElement {
       return;
     }
 
-    if (event.target === this.sizeChartDialog) {
-      this.closeSizeChart();
-    }
+
   }
 
   handleKeydown(event) {
@@ -511,6 +535,8 @@ class VariantPicker extends HTMLElement {
   }
 
   handlePopState() {
+    if (this.sectionRoot?.hasAttribute('data-featured-product')) return;
+    if (this.dataset.ignoreUrlVariant === 'true') return;
     if (window.Shopify?.designMode) return;
 
     const url = new URL(window.location.href);
@@ -537,45 +563,13 @@ class VariantPicker extends HTMLElement {
   }
 
   openSizeChart(opener) {
-    const dialog = this.sizeChartDialog;
-    if (!dialog || dialog.open) return;
-
-    this.sizeChartOpener = opener;
-    opener.setAttribute('aria-expanded', 'true');
-
-    try {
-      if (typeof dialog.showModal === 'function') {
-        dialog.showModal();
-      } else {
-        dialog.setAttribute('open', '');
-      }
-    } catch (error) {
-      dialog.setAttribute('open', '');
-    }
+    window.ThemeOverlay.get(this.sizeChartDialog)?.open({ opener });
   }
 
   closeSizeChart() {
-    const dialog = this.sizeChartDialog;
-    if (!dialog) return;
-
-    if (typeof dialog.close === 'function' && dialog.open) {
-      dialog.close();
-    } else {
-      dialog.removeAttribute('open');
-      this.handleSizeChartClose();
-    }
+    window.ThemeOverlay.get(this.sizeChartDialog)?.close();
   }
 
-  handleSizeChartCancel(event) {
-    event.preventDefault();
-    this.closeSizeChart();
-  }
-
-  handleSizeChartClose() {
-    this.sizeChartOpener?.setAttribute('aria-expanded', 'false');
-    if (this.sizeChartOpener?.isConnected) this.sizeChartOpener.focus();
-    this.sizeChartOpener = null;
-  }
 }
 
 if (!customElements.get('variant-picker')) {

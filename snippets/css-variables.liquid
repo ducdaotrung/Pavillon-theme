@@ -19,25 +19,25 @@
   endif
 
   assign default_background = settings.background_color | default: '#FFFFFF'
-  assign default_heading = settings.foreground_color | default: '#1C1B1A'
+  assign default_heading = settings.foreground_color | default: '#111111'
   assign default_heading_highlight = '#A67C52'
-  assign default_body = settings.foreground_color | default: '#1C1B1A'
-  assign default_accent = settings.color_accent | default: '#1C1B1A'
-  assign default_border = settings.color_border | default: '#D7D0C8'
+  assign default_body = settings.foreground_color | default: '#404040'
+  assign default_accent = settings.color_accent | default: '#111111'
+  assign default_border = settings.color_border | default: '#D8D8D8'
   assign default_shadow = default_body
-  assign default_sale_price = '#9A3D32'
+  assign default_sale_price = '#D82727'
   assign default_primary_background = default_accent
   assign default_primary_text = default_background
   assign default_primary_border = default_accent
-  assign default_primary_hover_background = 'transparent'
-  assign default_primary_hover_text = default_accent
-  assign default_primary_hover_border = default_accent
-  assign default_secondary_background = default_background
+  assign default_primary_hover_background = '#000000'
+  assign default_primary_hover_text = '#FFFFFF'
+  assign default_primary_hover_border = '#000000'
+  assign default_secondary_background = '#ECECEC'
   assign default_secondary_text = default_accent
-  assign default_secondary_border = default_accent
-  assign default_secondary_hover_background = 'transparent'
+  assign default_secondary_border = '#ECECEC'
+  assign default_secondary_hover_background = '#D8D8D8'
   assign default_secondary_hover_text = default_accent
-  assign default_secondary_hover_border = default_accent
+  assign default_secondary_hover_border = '#D8D8D8'
   assign default_tertiary_text = default_accent
   assign default_tertiary_border = 'transparent'
   assign default_tertiary_hover_background = 'transparent'
@@ -71,6 +71,8 @@
     endif
   endfor
 
+  assign default_body_rgb = default_body | color_to_rgb | remove: 'rgba(' | remove: 'rgb(' | remove: ')' | split: ',' | slice: 0, 3 | join: ' ' | strip
+
   assign overlay_scheme_id = settings.overlay_color_scheme | default: default_scheme_id
   if settings.overlay_color_scheme.id != blank
     assign overlay_scheme_id = settings.overlay_color_scheme.id
@@ -98,7 +100,8 @@
   if logo_width_mobile == blank
     assign logo_width_mobile = 140
   endif
-  assign page_width = settings.max_page_width | default: '1600px'
+  assign page_width = settings.max_page_width | default: 1600
+  assign page_width = page_width | remove: 'px' | append: 'px'
   assign page_margin_desktop = settings.layout_desktop_margin
   if page_margin_desktop == blank
     assign page_margin_desktop = 48
@@ -125,6 +128,8 @@
       assign body_leading = '1.5'
     when 'relaxed'
       assign body_leading = '1.6'
+    when 'loose'
+      assign body_leading = '1.75'
   endcase
 
   assign heading_weight = heading_font.weight | default: '400'
@@ -144,15 +149,19 @@
   assign heading_6_letter_spacing = '0em'
 
   assign heading_1_size_desktop = settings.type_heading_1_size_desktop | default: 64
+  assign heading_1_size_tablet = settings.type_heading_1_size_tablet | default: 52
   assign heading_1_size_mobile = settings.type_heading_1_size_mobile | default: 40
   assign heading_2_size_desktop = settings.type_heading_2_size_desktop | default: 40
-  assign heading_2_size_mobile = settings.type_heading_2_size_mobile | default: 32
+  assign heading_2_size_tablet = settings.type_heading_2_size_tablet | default: 34
+  assign heading_2_size_mobile = settings.type_heading_2_size_mobile | default: 30
   assign heading_3_size_desktop = settings.type_heading_3_size_desktop | default: 32
-  assign heading_3_size_mobile = settings.type_heading_3_size_mobile | default: 24
+  assign heading_3_size_tablet = settings.type_heading_3_size_tablet | default: 22
+  assign heading_3_size_mobile = settings.type_heading_3_size_mobile | default: 20
   assign heading_4_size_desktop = settings.type_heading_4_size_desktop | default: 24
-  assign heading_4_size_mobile = settings.type_heading_4_size_mobile | default: 20
+  assign heading_4_size_mobile = settings.type_heading_4_size_mobile | default: 18
   assign heading_5_size_desktop = settings.type_heading_5_size_desktop | default: 18
-  assign heading_5_size_mobile = settings.type_heading_5_size_mobile | default: 16
+  assign heading_5_size_tablet = settings.type_heading_5_size_tablet | default: 15
+  assign heading_5_size_mobile = settings.type_heading_5_size_mobile | default: 15
   assign heading_6_size_desktop = settings.type_heading_6_size_desktop | default: 16
   assign heading_6_size_mobile = settings.type_heading_6_size_mobile | default: 14
 
@@ -174,6 +183,10 @@
     when 'relaxed'
       assign heading_2_line_height = '1.3'
   endcase
+  assign heading_2_line_height_tablet = heading_2_line_height
+  if settings.type_heading_2_line_height == 'normal'
+    assign heading_2_line_height_tablet = '1.3'
+  endif
   assign heading_3_line_height = '1.3'
   case settings.type_heading_3_line_height
     when 'tight'
@@ -273,8 +286,10 @@
   endif
 
   assign motion_image_zoom = 1.04
+  assign product_card_image_zoom = 1.06
   if settings.motion_image_zoom == false
     assign motion_image_zoom = 1
+    assign product_card_image_zoom = 1
   endif
   assign motion_block_animations = 1
   if settings.motion_block_animations == false
@@ -397,15 +412,20 @@
     assign icon_button_radius = 'var(--radius-pill)'
   endif
 
-  assign button_height_desktop = settings.button_height_desktop | default: 48
-  assign button_height_mobile = settings.button_height_mobile | default: 44
-  assign button_padding_inline_desktop = settings.button_padding_inline_desktop | default: 28
-  assign button_padding_inline_mobile = settings.button_padding_inline_mobile | default: 24
+  assign button_height_desktop = settings.button_height_desktop | default: 45
+  assign button_height_mobile = settings.button_height_mobile | default: 45
+  assign button_padding_inline_desktop = settings.button_padding_inline_desktop | default: 30
+  assign button_padding_inline_mobile = settings.button_padding_inline_mobile | default: 16
   assign button_disabled_opacity = settings.button_disabled_opacity | default: 60 | divided_by: 100.0
-  assign button_font_size = '12px'
+  assign button_font_size = '13px'
   case settings.button_font_size
-    when '10px', '12px', '14px', '16px'
+    when '10px', '12px', '13px', '14px', '15px', '16px'
       assign button_font_size = settings.button_font_size
+  endcase
+  assign button_font_size_mobile = '15px'
+  case settings.button_font_size_mobile
+    when '12px', '13px', '14px', '15px', '16px'
+      assign button_font_size_mobile = settings.button_font_size_mobile
   endcase
   assign button_letter_spacing = '0em'
   case settings.button_letter_spacing
@@ -413,6 +433,8 @@
       assign button_letter_spacing = '0.02em'
     when 'loose'
       assign button_letter_spacing = '0.08em'
+    when 'reference'
+      assign button_letter_spacing = '1.2px'
     when 'extra_loose'
       assign button_letter_spacing = '0.14em'
   endcase
@@ -457,11 +479,6 @@
   assign button_tertiary_underline_offset = settings.button_tertiary_underline_offset | default: 3
   assign button_default_variant = 'primary'
 
-  assign input_style = 'solid'
-  if settings.input_style == 'outline'
-    assign input_style = 'outline'
-  endif
-
   assign input_height_desktop = settings.input_height_desktop
   if input_height_desktop == blank
     assign input_height_desktop = 48
@@ -486,10 +503,6 @@
     when 'pill'
       assign input_radius = 'var(--radius-pill)'
   endcase
-  assign input_background_color = settings.input_background_color | default: '#FFFFFF'
-  if input_style == 'outline'
-    assign input_background_color = 'transparent'
-  endif
 
   assign form_label_font_size = 'var(--font-body-md)'
   case settings.form_label_typography
@@ -682,12 +695,14 @@
   if settings.product_card_swatch_type == 'variant_image'
     assign product_card_swatch_type = 'variant_image'
   endif
-  assign product_card_swatch_limit = settings.product_card_swatch_limit | default: 4
+  assign product_card_swatch_limit = settings.product_card_swatch_limit | default: 4 | plus: 0
   assign product_card_swatch_gap = settings.product_card_swatch_gap | default: 8
   assign product_card_swatch_width_desktop = settings.product_card_swatch_width_desktop | default: 30
   assign product_card_swatch_width_mobile = settings.product_card_swatch_width_mobile | default: 30
-  assign product_card_swatch_ratio = '1 / 1'
+  assign product_card_swatch_ratio = '3 / 1'
   case settings.product_card_swatch_ratio
+    when '1_1'
+      assign product_card_swatch_ratio = '1 / 1'
     when '3_2'
       assign product_card_swatch_ratio = '3 / 2'
     when '2_1'
@@ -753,16 +768,20 @@
 
   assign overlay_title_size = 'var(--font-heading-md)'
   case settings.overlay_title_size
-    when 'heading_1'
+    when 'display', 'heading_1'
       assign overlay_title_size = 'var(--font-heading-display)'
-    when 'heading_2'
+    when 'xl', 'heading_2'
       assign overlay_title_size = 'var(--font-heading-xl)'
-    when 'heading_3'
+    when 'lg', 'heading_3'
       assign overlay_title_size = 'var(--font-heading-lg)'
-    when 'heading_5'
+    when 'md', 'heading_4'
+      assign overlay_title_size = 'var(--font-heading-md)'
+    when 'sm', 'heading_5'
       assign overlay_title_size = 'var(--font-heading-sm)'
-    when 'heading_6'
+    when 'xs', 'heading_6'
       assign overlay_title_size = 'var(--font-heading-xs)'
+    when 'custom'
+      assign overlay_title_size = settings.overlay_custom_title_size | default: 24 | append: 'px'
   endcase
 
   assign overlay_backdrop_blur = settings.overlay_backdrop_blur
@@ -790,11 +809,16 @@
   if settings.overlay_drawer_padding_mobile
     assign overlay_drawer_padding_mobile = '1.5rem'
   endif
+  assign overlay_drawer_content_padding_desktop = '1.5rem'
+  assign overlay_drawer_content_padding_mobile = '1rem'
 
   assign overlay_opacity = settings.overlay_opacity
   if overlay_opacity == blank
     assign overlay_opacity = 40
   endif
+  assign overlay_opacity_value = overlay_opacity | divided_by: 100.0
+  # Backdrop opacity owns alpha; color_to_rgb can return rgba for saved alpha colors.
+  assign overlay_backdrop_color = overlay_color | color_modify: 'alpha', overlay_opacity_value
   assign overlay_z_base = settings.overlay_z_base
   if overlay_z_base == blank
     assign overlay_z_base = 10
@@ -827,6 +851,8 @@
   {% endif %}
 
   :root {
+    --header-height: 0px;
+    --header-sticky-height: 0px;
     --font-body-family: {% if body_font != blank %}{{ body_font.family }}, {{ body_font.fallback_families }}{% else %}system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif{% endif %};
     --font-body-style: {% if body_font != blank %}{{ body_font.style }}{% else %}normal{% endif %};
     --font-body-weight: {% if body_font != blank %}{{ body_font.weight }}{% else %}400{% endif %};
@@ -849,7 +875,6 @@
     --page-margin-desktop: {{ page_margin_desktop }}px;
     --page-margin-tablet: {{ page_margin_tablet }}px;
     --page-margin-mobile: {{ mobile_margin }}px;
-    --page-margin: var(--page-margin-desktop);
     --layout-section-gap: {{ section_gap }}px;
     --layout-grid-gap: {{ grid_gap }}px;
 
@@ -857,15 +882,19 @@
     --heading-color: {{ default_heading }};
     --heading-highlight-color: {{ default_heading_highlight }};
     --body-color: {{ default_body }};
+    --color-foreground-rgb: {{ default_body_rgb }};
     --accent-color: {{ default_accent }};
     --border-color: {{ default_border }};
     --shadow-color: {{ default_shadow }};
     --sale-price-color: {{ default_sale_price }};
     --color-background: var(--background-color);
     --color-foreground: var(--body-color);
+    --color-foreground-rgb: {{ default_body_rgb }};
     --color-accent: var(--accent-color);
     --color-border: var(--border-color);
     --color-surface: color-mix(in srgb, var(--background-color) 94%, var(--body-color));
+    --placeholder-background-color: color-mix(in srgb, var(--background-color) 92%, var(--body-color));
+    --placeholder-fill-color: color-mix(in srgb, var(--body-color) 30%, transparent);
 
     --font-body-xs: {{ body_xs_size }}px;
     --font-body-sm: {{ body_sm_size }}px;
@@ -910,11 +939,6 @@
     --font-eyebrow-letter-spacing: {{ eyebrow_letter_spacing }};
     --font-eyebrow-text-transform: {{ eyebrow_text_case }};
     --font-eyebrow-weight: 500;
-    --font-p3-size: var(--font-eyebrow-size);
-    --font-p3-line-height: var(--font-eyebrow-line-height);
-    --font-p3-letter-spacing: var(--font-eyebrow-letter-spacing);
-    --font-p3-text-transform: var(--font-eyebrow-text-transform);
-    --font-p3-weight: var(--font-eyebrow-weight);
     --type-body-size: var(--font-body-md);
     --type-body-leading: var(--font-body-line-height);
     --type-heading-1-size: var(--font-heading-display);
@@ -939,6 +963,7 @@
     --motion-distance-hover: -2px;
     --motion-distance-block: 1rem;
     --motion-image-zoom: {{ motion_image_zoom }};
+    --product-card-image-zoom: {{ product_card_image_zoom }};
     --motion-block-animations: {{ motion_block_animations }};
     --motion-block-animation: {{ motion_block_animation }};
 
@@ -984,6 +1009,21 @@
     --icon-button-radius: {{ icon_button_radius }};
     --button-height: {{ button_height_desktop }}px;
     --button-height-mobile: {{ button_height_mobile }}px;
+    --swiper-nav-size: var(--button-height);
+    --swiper-nav-size-mobile: var(--button-height-mobile);
+    --swiper-nav-icon-size: var(--icon-size-medium);
+    --swiper-pagination-progressbar-size: 2px;
+    --swiper-pagination-bullet-hit-size: 24px;
+    --swiper-pagination-bullet-hit-width: 24px;
+    --swiper-pagination-bullet-active-hit-width: 48px;
+    --swiper-pagination-bullet-size: 8px;
+    --swiper-pagination-bullet-width: 8px;
+    --swiper-pagination-bullet-height: 8px;
+    --swiper-pagination-bullet-active-width: 32px;
+    --swiper-pagination-bullet-active-height: 8px;
+    --swiper-pagination-bullet-border-radius: var(--radius-pill, 1000px);
+    --swiper-pagination-bullet-gap: 8px;
+    --swiper-pagination-bullet-progress-duration: 4s;
     --control-height-2xs: 3.0rem;
     --control-height-xs: 3.4rem;
     --control-height-sm: 4.0rem;
@@ -994,6 +1034,7 @@
     --button-padding-inline-mobile: {{ button_padding_inline_mobile }}px;
     --button-disabled-opacity: {{ button_disabled_opacity }};
     --button-font-size: {{ button_font_size }};
+    --button-font-size-mobile: {{ button_font_size_mobile }};
     --button-letter-spacing: {{ button_letter_spacing }};
     --button-font-weight: var(--font-body-weight);
     --button-font-family: {{ button_primary_font_family }};
@@ -1013,12 +1054,13 @@
     --button-tertiary-text-decoration: {{ button_tertiary_underline }};
     --button-tertiary-underline-display: {{ button_tertiary_underline_display }};
 
-    --input-style: {{ input_style }};
     --input-height: {{ input_height_desktop }}px;
     --input-height-mobile: {{ input_height_mobile }}px;
     --input-radius: {{ input_radius }};
-    --input-border-width: {{ input_border_width }}px;
-    --input-background-color: {{ input_background_color }};
+    --input-border-width-outline: {{ input_border_width }}px;
+    --input-border-width: 0px;
+    --input-background-color-solid: color-mix(in srgb, var(--body-color) 6%, transparent);
+    --input-background-color: var(--input-background-color-solid);
     --input-border-color: var(--border-color);
     --input-focus-color: var(--accent-color);
     --input-error-color: var(--sale-price-color);
@@ -1033,50 +1075,55 @@
     --input-border: var(--input-border-color);
     --input-focus: var(--input-focus-color);
     --style-border-radius-inputs: var(--input-radius);
+    --quantity-selector-height: 3.4rem;
+    --quantity-selector-height-mobile: 3.4rem;
+    --quantity-selector-button-width: 3rem;
+    --quantity-selector-input-width: 3rem;
+    --quantity-selector-input-width-mobile: 2rem;
+    --quantity-selector-icon-size: 1.4rem;
 
-    --pcard-style: {{ product_card_style }};
-    --pcard-border-width: {{ product_card_border_width }}px;
-    --pcard-shadow: {{ product_card_shadow }};
-    --pcard-title-font-family: {{ product_card_title_font_family }};
-    --pcard-title-size: {{ product_card_title_size_desktop }}px;
-    --pcard-title-size-mobile: {{ product_card_title_size_mobile }}px;
-    --pcard-image-ratio: {{ product_card_image_ratio }};
-    --pcard-alignment: {{ product_card_alignment }};
-    --pcard-content-alignment: {{ product_card_content_alignment }};
-    --pcard-title-line-limit: {{ product_card_title_line_limit }};
-    --pcard-content-spacing: {{ product_card_content_spacing_desktop }}px;
-    --pcard-content-spacing-mobile: {{ product_card_content_spacing_mobile }}px;
-    --pcard-content-gap: {{ product_card_content_gap_desktop }}px;
-    --pcard-content-gap-mobile: {{ product_card_content_gap_mobile }}px;
-    --pcard-product-info-gap: {{ product_card_info_gap_desktop }}px;
-    --pcard-product-info-gap-mobile: {{ product_card_info_gap_mobile }}px;
+    --product-card-style: {{ product_card_style }};
+    --product-card-border-width: {{ product_card_border_width }}px;
+    --product-card-shadow: {{ product_card_shadow }};
+    --product-card-title-font-family: {{ product_card_title_font_family }};
+    --product-card-title-size: {{ product_card_title_size_desktop }}px;
+    --product-card-title-size-mobile: {{ product_card_title_size_mobile }}px;
+    --product-card-image-ratio: {{ product_card_image_ratio }};
+    --product-card-alignment: {{ product_card_alignment }};
+    --product-card-content-alignment: {{ product_card_content_alignment }};
+    --product-card-title-line-limit: {{ product_card_title_line_limit }};
+    --product-card-content-spacing: {{ product_card_content_spacing_desktop }}px;
+    --product-card-content-spacing-mobile: {{ product_card_content_spacing_mobile }}px;
+    --product-card-content-gap: {{ product_card_content_gap_desktop }}px;
+    --product-card-content-gap-mobile: {{ product_card_content_gap_mobile }}px;
+    --product-card-info-gap: {{ product_card_info_gap_desktop }}px;
+    --product-card-info-gap-mobile: {{ product_card_info_gap_mobile }}px;
     --card-radius: {{ media_container_radius }};
     --media-radius: {{ media_container_radius }};
-    --pcard-quick-add-enabled: {{ product_card_quick_add_enabled }};
-    --pcard-quick-add-mobile: {{ product_card_quick_add_mobile }};
-    --pcard-quick-add-style: {{ product_card_quick_add_style }};
-    --pcard-quick-add-full-width: {{ product_card_quick_add_full_width }};
-    --pcard-quick-view-enabled: {{ product_card_quick_view_enabled }};
-    --pcard-quick-view-mobile: {{ product_card_quick_view_mobile }};
-    --pcard-show-secondary-image: {{ product_card_secondary }};
-    --pcard-show-sale-badge: {{ product_card_show_sale_badge }};
-    --pcard-show-sold-out-badge: {{ product_card_show_sold_out_badge }};
-    --pcard-show-vendor: {{ product_card_vendor }};
-    --pcard-show-type: {{ product_card_type }};
-    --pcard-swatch-enabled: {{ product_card_swatches_enabled }};
-    --pcard-swatch-position: {{ product_card_swatch_position }};
-    --pcard-swatch-type: {{ product_card_swatch_type }};
-    --pcard-swatch-limit: {{ product_card_swatch_limit }};
-    --pcard-swatch-gap: {{ product_card_swatch_gap }}px;
-    --pcard-swatch-width: {{ product_card_swatch_width_desktop }}px;
-    --pcard-swatch-width-mobile: {{ product_card_swatch_width_mobile }}px;
-    --pcard-swatch-ratio: {{ product_card_swatch_ratio }};
-    --pcard-swatch-selected-style: {{ product_card_swatch_selected_style }};
+    --product-card-quick-add-enabled: {{ product_card_quick_add_enabled }};
+    --product-card-quick-add-mobile: {{ product_card_quick_add_mobile }};
+    --product-card-quick-add-style: {{ product_card_quick_add_style }};
+    --product-card-quick-add-full-width: {{ product_card_quick_add_full_width }};
+    --product-card-quick-view-enabled: {{ product_card_quick_view_enabled }};
+    --product-card-quick-view-mobile: {{ product_card_quick_view_mobile }};
+    --product-card-show-secondary-image: {{ product_card_secondary }};
+    --product-card-show-sale-badge: {{ product_card_show_sale_badge }};
+    --product-card-show-sold-out-badge: {{ product_card_show_sold_out_badge }};
+    --product-card-show-vendor: {{ product_card_vendor }};
+    --product-card-show-type: {{ product_card_type }};
+    --product-card-swatch-enabled: {{ product_card_swatches_enabled }};
+    --product-card-swatch-position: {{ product_card_swatch_position }};
+    --product-card-swatch-type: {{ product_card_swatch_type }};
+    --product-card-swatch-limit: {{ product_card_swatch_limit }};
+    --product-card-swatch-gap: {{ product_card_swatch_gap }}px;
+    --product-card-swatch-width: {{ product_card_swatch_width_desktop }}px;
+    --product-card-swatch-width-mobile: {{ product_card_swatch_width_mobile }}px;
+    --product-card-swatch-ratio: {{ product_card_swatch_ratio }};
+    --product-card-swatch-selected-style: {{ product_card_swatch_selected_style }};
 
     /* Legacy aliases remain valid for existing product-card styles. */
     --product-card-ratio: {{ product_card_ratio }};
-    --product-card-alignment: var(--pcard-alignment);
-    --product-card-secondary: var(--pcard-show-secondary-image);
+    --product-card-secondary: var(--product-card-show-secondary-image);
 
     --variant-height: {{ variant_height_desktop }}px;
     --variant-height-mobile: {{ variant_height_mobile }}px;
@@ -1103,7 +1150,7 @@
     --overlay-radius: {{ overlay_radius }};
     --badge-font-family: var(--font-body-family);
     --badge-font-size: var(--font-body-xs);
-    --badge-font-weight: 600;
+    --badge-font-weight: 500;
     --badge-letter-spacing: var(--font-body-letter-spacing);
     --badge-padding: 0.2rem 0.55rem;
     --badge-sale-price: {{ badge_sale_price }};
@@ -1126,26 +1173,30 @@
     --overlay-border-color: {{ overlay_border_color }};
     --overlay-shadow-color: {{ overlay_shadow_color }};
     --overlay-color: {{ overlay_color }};
-    --overlay-opacity: {{ overlay_opacity | divided_by: 100.0 }};
+    --overlay-opacity: {{ overlay_opacity_value }};
+    --overlay-backdrop-color: {{ overlay_backdrop_color }};
     --overlay-backdrop-blur: {{ overlay_backdrop_blur }}px;
     --overlay-popover-border-width: {{ overlay_popover_border_width }}px;
     --overlay-popover-shadow: {{ overlay_popover_shadow }};
     --overlay-title-size: {{ overlay_title_size }};
     --overlay-drawer-padding-desktop: {{ overlay_drawer_padding_desktop }};
     --overlay-drawer-padding-mobile: {{ overlay_drawer_padding_mobile }};
-    --z-base: {{ overlay_z_base }};
-    --z-drawer: {{ overlay_z_drawer }};
-    --z-modal: {{ overlay_z_modal }};
+    --overlay-drawer-content-padding-desktop: {{ overlay_drawer_content_padding_desktop }};
+    --overlay-drawer-content-padding-mobile: {{ overlay_drawer_content_padding_mobile }};
+    --z-base: {{ overlay_z_base | default: 10 }};
+    --z-drawer: {{ overlay_z_drawer | default: 200 }};
+    --z-modal: {{ overlay_z_modal | default: 1000 }};
   }
 
   @media (min-width: 768px) and (max-width: 1149.98px) {
     :root {
-      --font-heading-xs: {{ heading_6_size_desktop | times: 0.875 }}px;
-      --font-heading-sm: {{ heading_5_size_desktop | times: 0.875 }}px;
-      --font-heading-md: {{ heading_4_size_desktop | times: 0.875 }}px;
-      --font-heading-lg: {{ heading_3_size_desktop | times: 0.875 }}px;
-      --font-heading-xl: {{ heading_2_size_desktop | times: 0.875 }}px;
-      --font-heading-display: {{ heading_1_size_desktop | times: 0.875 }}px;
+      --font-heading-xs: {{ heading_6_size_desktop }}px;
+      --font-heading-sm: {{ heading_5_size_tablet }}px;
+      --font-heading-md: {{ heading_4_size_desktop }}px;
+      --font-heading-lg: {{ heading_3_size_tablet }}px;
+      --font-heading-xl: {{ heading_2_size_tablet }}px;
+      --font-heading-display: {{ heading_1_size_tablet }}px;
+      --font-heading-xl-line-height: {{ heading_2_line_height_tablet }};
     }
   }
 
@@ -1161,39 +1212,78 @@
   }
 
   {% for scheme in settings.color_schemes %}
+    {%- comment -%}
+      Normalize every scheme token before emitting CSS. Older theme data can
+      omit settings that were added later; a direct scheme.settings.* output
+      would otherwise leave an invalid empty custom property behind.
+    {%- endcomment -%}
+    {% assign scheme_background = scheme.settings.background | default: default_background %}
+    {% assign scheme_heading = scheme.settings.heading | default: default_heading %}
+    {% assign scheme_heading_highlight = scheme.settings.heading_highlight | default: default_heading_highlight %}
+    {% assign scheme_body = scheme.settings.text | default: default_body %}
+    {% assign scheme_accent = scheme.settings.accent | default: default_accent %}
+    {% assign scheme_border = scheme.settings.border | default: default_border %}
+    {% assign scheme_shadow = scheme.settings.shadow | default: default_shadow %}
+    {% assign scheme_sale_price = scheme.settings.sale_price | default: default_sale_price %}
+    {% assign scheme_primary_background = scheme.settings.button_primary_background | default: default_primary_background %}
+    {% assign scheme_primary_text = scheme.settings.button_primary_text | default: default_primary_text %}
+    {% assign scheme_primary_border = scheme.settings.button_primary_border | default: default_primary_border %}
+    {% assign scheme_primary_hover_background = scheme.settings.button_primary_hover_background | default: 'transparent' %}
+    {% assign scheme_primary_hover_text = scheme.settings.button_primary_hover_text | default: default_primary_hover_text %}
+    {% assign scheme_primary_hover_border = scheme.settings.button_primary_hover_border | default: default_primary_hover_border %}
+    {% assign scheme_secondary_background = scheme.settings.button_secondary_background | default: default_secondary_background %}
+    {% assign scheme_secondary_text = scheme.settings.button_secondary_text | default: default_secondary_text %}
+    {% assign scheme_secondary_border = scheme.settings.button_secondary_border | default: default_secondary_border %}
+    {% assign scheme_secondary_hover_background = scheme.settings.button_secondary_hover_background | default: 'transparent' %}
+    {% assign scheme_secondary_hover_text = scheme.settings.button_secondary_hover_text | default: default_secondary_hover_text %}
+    {% assign scheme_secondary_hover_border = scheme.settings.button_secondary_hover_border | default: default_secondary_hover_border %}
+    {% assign scheme_tertiary_text = scheme.settings.button_tertiary_text | default: default_tertiary_text %}
+    {% assign scheme_tertiary_hover_text = scheme.settings.button_tertiary_hover_text | default: default_tertiary_hover_text %}
+    {% assign scheme_body_rgb = scheme_body | color_to_rgb | remove: 'rgba(' | remove: 'rgb(' | remove: ')' | split: ',' | slice: 0, 3 | join: ' ' | strip %}
     .{{ scheme.id }} {
-      --background-color: {{ scheme.settings.background }};
-      --heading-color: {{ scheme.settings.heading }};
-      --heading-highlight-color: {{ scheme.settings.heading_highlight }};
-      --body-color: {{ scheme.settings.text }};
-      --accent-color: {{ scheme.settings.accent }};
-      --border-color: {{ scheme.settings.border }};
-      --shadow-color: {{ scheme.settings.shadow }};
-      --sale-price-color: {{ scheme.settings.sale_price }};
-      --button-primary-background: {{ scheme.settings.button_primary_background }};
-      --button-primary-text: {{ scheme.settings.button_primary_text }};
-      --button-primary-border: {{ scheme.settings.button_primary_border }};
-      --button-primary-hover-background: {% if scheme.settings.button_primary_hover_background != blank %}{{ scheme.settings.button_primary_hover_background }}{% else %}transparent{% endif %};
-      --button-primary-hover-text: {{ scheme.settings.button_primary_hover_text }};
-      --button-primary-hover-border: {{ scheme.settings.button_primary_hover_border }};
-      --button-secondary-background: {{ scheme.settings.button_secondary_background }};
-      --button-secondary-text: {{ scheme.settings.button_secondary_text }};
-      --button-secondary-border: {{ scheme.settings.button_secondary_border }};
-      --button-secondary-hover-background: {% if scheme.settings.button_secondary_hover_background != blank %}{{ scheme.settings.button_secondary_hover_background }}{% else %}transparent{% endif %};
-      --button-secondary-hover-text: {{ scheme.settings.button_secondary_hover_text }};
-      --button-secondary-hover-border: {{ scheme.settings.button_secondary_hover_border }};
+      --background-color: {{ scheme_background }};
+      --heading-color: {{ scheme_heading }};
+      --heading-highlight-color: {{ scheme_heading_highlight }};
+      --body-color: {{ scheme_body }};
+      --color-foreground-rgb: {{ scheme_body_rgb }};
+      --accent-color: {{ scheme_accent }};
+      --input-focus-color: var(--accent-color);
+      --input-focus: var(--input-focus-color);
+      --input-text-color: var(--body-color);
+      --price-compare-color: var(--body-color);
+      --price-unit-color: var(--body-color);
+      --border-color: {{ scheme_border }};
+      --input-border-color: var(--border-color);
+      --shadow-color: {{ scheme_shadow }};
+      --sale-price-color: {{ scheme_sale_price }};
+      --price-sale-color: var(--sale-price-color);
+      --button-primary-background: {{ scheme_primary_background }};
+      --button-primary-text: {{ scheme_primary_text }};
+      --button-primary-border: {{ scheme_primary_border }};
+      --button-primary-hover-background: {{ scheme_primary_hover_background }};
+      --button-primary-hover-text: {{ scheme_primary_hover_text }};
+      --button-primary-hover-border: {{ scheme_primary_hover_border }};
+      --button-secondary-background: {{ scheme_secondary_background }};
+      --button-secondary-text: {{ scheme_secondary_text }};
+      --button-secondary-border: {{ scheme_secondary_border }};
+      --button-secondary-hover-background: {{ scheme_secondary_hover_background }};
+      --button-secondary-hover-text: {{ scheme_secondary_hover_text }};
+      --button-secondary-hover-border: {{ scheme_secondary_hover_border }};
       --button-tertiary-background: transparent;
-      --button-tertiary-text: {{ scheme.settings.button_tertiary_text }};
+      --button-tertiary-text: {{ scheme_tertiary_text }};
       --button-tertiary-border: transparent;
       --button-tertiary-hover-background: transparent;
-      --button-tertiary-hover-text: {{ scheme.settings.button_tertiary_hover_text }};
+      --button-tertiary-hover-text: {{ scheme_tertiary_hover_text }};
       --button-tertiary-hover-border: transparent;
 
       --color-background: var(--background-color);
       --color-foreground: var(--body-color);
+      --color-foreground-rgb: {{ scheme_body_rgb }};
       --color-accent: var(--accent-color);
       --color-border: var(--border-color);
       --color-surface: color-mix(in srgb, var(--background-color) 94%, var(--body-color));
+      --placeholder-background-color: color-mix(in srgb, var(--background-color) 92%, var(--body-color));
+      --placeholder-fill-color: color-mix(in srgb, var(--body-color) 30%, transparent);
       --button-background: var(--button-{{ button_default_variant }}-background);
       --button-foreground: var(--button-{{ button_default_variant }}-text);
       --button-border: var(--button-{{ button_default_variant }}-border);

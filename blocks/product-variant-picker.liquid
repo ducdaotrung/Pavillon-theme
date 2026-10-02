@@ -1,18 +1,22 @@
 {% doc %}
   Renders variant options using the global Variant picker and Swatches settings.
-  The picker writes its selected variant to the sibling product form by ID.
+  The picker emits variant changes to every buy-button block in this section.
 {% enddoc %}
 
 {% liquid
   assign picker_product = closest.product | default: product
   assign current_variant = picker_product.selected_or_first_available_variant
-  assign form_id = 'ProductForm-' | append: section.id
   assign media_gallery_id = 'ProductMedia-' | append: section.id
 
   assign show_option_names = true
   if block.settings.show_option_names == false
     assign show_option_names = false
   endif
+
+  assign color_option_display = block.settings.color_option_display | default: 'color'
+  unless color_option_display == 'text'
+    assign color_option_display = 'color'
+  endunless
 
   assign size_chart_option_name = block.settings.size_chart_option_name | default: 'Size' | strip
   assign size_chart_desktop_layout = block.settings.size_chart_desktop_layout | default: 'modal'
@@ -76,26 +80,22 @@
 {% endcapture %}
 {% assign picker_style = picker_style | strip %}
 
-{% if picker_product.has_only_default_variant == false or request.design_mode %}
+{% if picker_product != blank and picker_product.has_only_default_variant == false %}
   <div class="product-variant-picker" data-product-variant-picker-block{% if picker_style != blank %} style="{{ picker_style }}"{% endif %} {{ block.shopify_attributes }}>
-    {% if picker_product.has_only_default_variant == false %}
-      {% render 'variant-picker',
-        product: picker_product,
-        current_variant: current_variant,
-        section_id: section.id,
-        media_gallery_id: media_gallery_id,
-        form_id: form_id,
-        block_id: block.id,
-        show_option_names: show_option_names,
-        size_chart_option_name: size_chart_option_name,
-        size_chart_page: block.settings.size_chart_page,
-        size_chart_desktop_layout: size_chart_desktop_layout,
-        size_chart_mobile_layout: size_chart_mobile_layout,
-        size_chart_width: size_chart_width
-      %}
-    {% elsif request.design_mode %}
-      <span class="visually-hidden">{{ 'products.variant_picker' | t }}</span>
-    {% endif %}
+    {% render 'variant-picker',
+      product: picker_product,
+      current_variant: current_variant,
+      section_id: section.id,
+      media_gallery_id: media_gallery_id,
+      block_id: block.id,
+      show_option_names: show_option_names,
+      color_option_display: color_option_display,
+      size_chart_option_name: size_chart_option_name,
+      size_chart_page: block.settings.size_chart_page,
+      size_chart_desktop_layout: size_chart_desktop_layout,
+      size_chart_mobile_layout: size_chart_mobile_layout,
+      size_chart_width: size_chart_width
+    %}
   </div>
 {% endif %}
 
@@ -120,6 +120,21 @@
     },
     {
       "type": "header",
+      "content": "t:general.swatches"
+    },
+    {
+      "type": "select",
+      "id": "color_option_display",
+      "label": "t:labels.color_option_display",
+      "options": [
+        { "value": "text", "label": "t:options.color_option_display.text" },
+        { "value": "color", "label": "t:options.color_option_display.color" }
+      ],
+      "default": "color",
+      "info": "t:info.color_option_display"
+    },
+    {
+      "type": "header",
       "content": "t:general.size_guide"
     },
     {
@@ -127,7 +142,8 @@
       "id": "size_chart_option_name",
       "label": "t:labels.size_guide_option",
       "info": "t:info.size_guide_option",
-      "default": "Size"
+      "default": "Size",
+      "visible_if": "{{ block.settings.size_chart_page != blank }}"
     },
     {
       "type": "page",
@@ -137,7 +153,8 @@
     },
     {
       "type": "header",
-      "content": "t:general.size_guide_layout"
+      "content": "t:general.size_guide_layout",
+      "visible_if": "{{ block.settings.size_chart_page != blank }}"
     },
     {
       "type": "select",
@@ -147,7 +164,8 @@
         { "value": "modal", "label": "t:options.size_guide_layout.modal" },
         { "value": "drawer", "label": "t:options.size_guide_layout.drawer" }
       ],
-      "default": "modal"
+      "default": "modal",
+      "visible_if": "{{ block.settings.size_chart_page != blank }}"
     },
     {
       "type": "range",
@@ -158,7 +176,8 @@
       "max": 960,
       "step": 10,
       "unit": "px",
-      "default": 600
+      "default": 600,
+      "visible_if": "{{ block.settings.size_chart_page != blank }}"
     },
     {
       "type": "select",
@@ -168,7 +187,8 @@
         { "value": "bottom_sheet", "label": "t:options.size_guide_layout.bottom_sheet" },
         { "value": "drawer", "label": "t:options.size_guide_layout.drawer" }
       ],
-      "default": "bottom_sheet"
+      "default": "bottom_sheet",
+      "visible_if": "{{ block.settings.size_chart_page != blank }}"
     },
     {
       "type": "header",
@@ -263,6 +283,12 @@
       "unit": "px",
       "default": 0,
       "visible_if": "{{ block.settings.customize_mobile_padding }}"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:general.variant_picker",
+      "category": "t:general.product"
     }
   ]
 }

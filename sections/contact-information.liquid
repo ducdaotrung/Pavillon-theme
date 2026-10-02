@@ -96,12 +96,8 @@
   }
 
   .contact-information__grid > .group {
-    width: 100%;
-    max-width: none;
     min-width: 0;
     min-height: 170px;
-    --group-align: center;
-    text-align: center;
   }
 
   @media (max-width: 767.98px) {
@@ -123,7 +119,7 @@
 
 {% schema %}
 {
-  "name": "t:general.contact_information",
+  "name": "Icon text wide cards",
   "class": "section-kernel",
   "blocks": [{ "type": "group" }],
   "settings": [
@@ -183,6 +179,7 @@
     },
     {
       "type": "color",
+      "alpha": true,
       "id": "background_color",
       "label": "t:labels.background"
     },
@@ -246,7 +243,7 @@
   ],
   "presets": [
     {
-      "name": "t:general.contact_information",
+      "name": "Icon text wide cards",
       "category": "t:general.content",
       "settings": {
         "section_width": "page_width",

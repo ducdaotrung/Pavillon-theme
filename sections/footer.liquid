@@ -38,23 +38,32 @@
 %}
 
 {% capture footer_style %}
-  {% if footer_padding_top != 48 %}--footer-padding-top: {{ footer_padding_top }}px;{% endif %}
-  {% if footer_padding_bottom != 48 %}--footer-padding-bottom: {{ footer_padding_bottom }}px;{% endif %}
-  {% if footer_gap_desktop != 24 %}--footer-gap-desktop: {{ footer_gap_desktop }}px;{% endif %}
-  {% if footer_gap_mobile != 24 %}--footer-gap-mobile: {{ footer_gap_mobile }}px;{% endif %}
+  --footer-padding-top: {{ footer_padding_top }}px;
+  --footer-padding-bottom: {{ footer_padding_bottom }}px;
   {% if section.settings.customize_mobile_padding %}
-    {% if footer_padding_top_mobile != footer_padding_top %}--footer-padding-top-mobile: {{ footer_padding_top_mobile }}px;{% endif %}
-    {% if footer_padding_bottom_mobile != footer_padding_bottom %}--footer-padding-bottom-mobile: {{ footer_padding_bottom_mobile }}px;{% endif %}
+    --footer-padding-top-mobile: {{ footer_padding_top_mobile }}px;
+    --footer-padding-bottom-mobile: {{ footer_padding_bottom_mobile }}px;
   {% endif %}
 {% endcapture %}
 {% assign footer_style = footer_style | strip %}
+
+{% capture footer_layout_style %}
+  {% render 'layout-flow-style',
+    direction: 'column',
+    wrap: 'nowrap',
+    align_items: 'stretch',
+    gap: footer_gap_desktop,
+    gap_mobile: footer_gap_mobile
+  %}
+{% endcapture %}
+{% assign footer_layout_style = footer_layout_style | strip %}
 
 <footer
   class="section-spacing footer color-scheme section-color-scope {{ footer_scheme }}"
   {% if footer_style != blank %}style="{{ footer_style }}"{% endif %}
 >
   <div class="container {{ footer_container_width }} footer__container">
-    <div class="footer__layout">
+    <div class="footer__layout layout-flow layout-flow--responsive" style="{{ footer_layout_style }}">
       {% content_for 'blocks' %}
     </div>
   </div>
@@ -73,13 +82,6 @@
     min-width: 0;
   }
 
-  .footer__layout {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    row-gap: var(--footer-gap-desktop, 24px);
-  }
-
   .footer__layout > * {
     min-width: 0;
     max-width: 100%;
@@ -89,21 +91,6 @@
     .footer {
       padding-top: var(--footer-padding-top-mobile, var(--footer-padding-top, 2rem));
       padding-bottom: var(--footer-padding-bottom-mobile, var(--footer-padding-bottom, 2rem));
-    }
-
-    .footer__layout {
-      row-gap: var(--footer-gap-mobile, var(--footer-gap-desktop, 24px));
-    }
-
-    .footer__layout > .block-row {
-      flex-direction: column;
-      gap: var(--row-gap-mobile, 16px);
-    }
-
-    .footer__layout > .block-row > .block-column {
-      flex: 0 0 auto;
-      width: 100%;
-      min-width: 0;
     }
   }
 {% endstylesheet %}
@@ -241,9 +228,6 @@
         {
           "type": "row",
           "settings": {
-            "columns_desktop": "4",
-            "columns_tablet": "4",
-            "columns_mobile": "1",
             "gap_desktop": 32,
             "gap_mobile": 0
           },
@@ -311,18 +295,8 @@
               },
               "blocks": [
                 {
-                  "type": "menu",
-                  "settings": {
-                    "menu": "follow-us",
-                    "heading": "Follow us",
-                    "collapse_menu_on_mobile": true,
-                    "icon": "plus",
-                    "heading_gap": 16,
-                    "menu_gap": 8,
-                    "heading_size": "xs",
-                    "html_tag": "h2",
-                    "menu_size": "md"
-                  }
+                  "type": "social-links",
+                  "settings": {}
                 }
               ]
             },
@@ -379,10 +353,6 @@
         {
           "type": "row",
           "settings": {
-            "columns_desktop": "custom",
-            "columns_desktop_custom": 1,
-            "columns_tablet": "1",
-            "columns_mobile": "1",
             "gap_desktop": 0,
             "gap_mobile": 0
           },
@@ -434,7 +404,6 @@
             "gap_desktop": 24,
             "gap_mobile": 24,
             "width": "fill",
-            "customize_mobile_size": false,
             "width_mobile": "fill",
             "height": "fit",
             "appearance_type": "inherit",
@@ -457,7 +426,6 @@
                 "gap_desktop": 24,
                 "gap_mobile": 20,
                 "width": "fit",
-                "customize_mobile_size": false,
                 "width_mobile": "fit",
                 "height": "fit",
                 "appearance_type": "inherit",
@@ -501,7 +469,6 @@
                 "gap_desktop": 12,
                 "gap_mobile": 8,
                 "width": "fit",
-                "customize_mobile_size": false,
                 "width_mobile": "fit",
                 "height": "fit",
                 "appearance_type": "inherit",

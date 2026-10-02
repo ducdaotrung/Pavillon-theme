@@ -77,27 +77,27 @@
 {% assign product_information_style = product_information_style | strip %}
 
 {{ 'product-information.css' | asset_url | stylesheet_tag }}
+{{ 'product-information-extras.css' | asset_url | stylesheet_tag }}
 {{ 'product-media.css' | asset_url | stylesheet_tag }}
-{% render 'swiper-stylesheet' %}
-
 <div
   class="section-spacing product-information color-scheme section-color-scope {{ product_information_scheme }}"
   data-product-information
   {% if product_information_style != blank %}style="{{ product_information_style }}"{% endif %}
 >
   <div class="container {{ container_class }} product-information__container{% if product_information_width == 'full_no_padding' %} product-information__container--no-padding{% endif %}">
-    <div class="product-information__layout">
+    <product-sticky-layout class="product-information__layout"{% unless section.settings.sticky_content == false %} data-sticky-enabled{% endunless %}>
       {% content_for 'block', type: '_product-media', id: 'product-media' %}
       {% content_for 'block', type: '_product-details', id: 'product-details' %}
-    </div>
+    </product-sticky-layout>
   </div>
 </div>
 
-<script src="{{ 'variant-picker.js' | asset_url }}" defer></script>
+<script type="module" src="{{ 'variant-picker.js' | asset_url }}"></script>
 <script type="module" src="{{ 'product-buy-buttons.js' | asset_url }}"></script>
 <script type="module" src="{{ 'product-description.js' | asset_url }}"></script>
 <script type="module" src="{{ 'product-inventory.js' | asset_url }}"></script>
 <script type="module" src="{{ 'product-media.js' | asset_url }}"></script>
+<script type="module" src="{{ 'product-information-extras.js' | asset_url }}"></script>
 
 {% schema %}
 {
@@ -112,7 +112,7 @@
     {
       "type": "checkbox",
       "id": "sticky_content",
-      "label": "t:labels.sticky_details",
+      "label": "t:labels.sticky_content",
       "default": true
     },
     {

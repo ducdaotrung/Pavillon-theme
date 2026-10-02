@@ -8,15 +8,15 @@
   const state = {
     drawer: null,
     sectionRoot: null,
+    overlay: null,
     opener: null,
-    previousFocus: null,
-    closeTimer: null,
     request: null,
     cart: null,
     editorSelected: false,
     recommendationProductId: null,
     variantComparePrices: new Map(),
     orderOptionsDrag: null,
+    cartRevision: 0,
   };
 
   const getDrawer = (root = document) => {
@@ -52,9 +52,10 @@
       badge.setAttribute('aria-label', String(count));
     });
     document.querySelectorAll('[data-cart-count]').forEach((badge) => {
+      const isTextCount = badge.classList.contains('header-cart__count--text');
       badge.textContent = count > 99 ? '99+' : String(count);
       badge.setAttribute('aria-label', String(count));
-      badge.hidden = count === 0;
+      badge.hidden = !isTextCount && count === 0;
     });
     document.querySelectorAll('[data-cart-drawer-open]').forEach((trigger) => {
       const label = trigger.dataset.cartLabel || 'Cart';
@@ -322,9 +323,12 @@
     list.hidden = codes.length === 0;
   };
 
-  const updateCartUI = async (cart) => {
+  const updateCartUI = async (cart, { awaitRecommendations = true } = {}) => {
     if (!state.drawer || !cart?.items) return;
+    const drawer = state.drawer;
+    const revision = ++state.cartRevision;
     await hydrateVariantComparePrices(cart);
+    if (state.drawer !== drawer || state.cartRevision !== revision) return;
     state.cart = cart;
     const currency = cart.currency || state.drawer.dataset.currency || 'USD';
     const items = state.drawer.querySelector('[data-cart-drawer-items]');
@@ -346,16 +350,17 @@
     const discountCount = getAppliedDiscountCount(cart);
 
     if (items) {
+      const currentLines = new Map(Array.from(items.querySelectorAll('[data-cart-line]'))
+        .map((line) => [line.dataset.lineKey, line]));
       const nextKeys = new Set(cart.items.map((item) => String(item.key)));
-      items.querySelectorAll('[data-cart-line]').forEach((line) => {
-        if (!nextKeys.has(String(line.dataset.lineKey))) line.remove();
+      currentLines.forEach((line, key) => {
+        if (!nextKeys.has(key)) line.remove();
       });
       cart.items.forEach((item, index) => {
         const template = document.createElement('template');
         template.innerHTML = renderCartLine(item, index + 1, currency).trim();
         const nextLine = template.content.firstElementChild;
-        const currentLine = Array.from(items.querySelectorAll('[data-cart-line]'))
-          .find((line) => line.dataset.lineKey === String(item.key));
+        const currentLine = currentLines.get(String(item.key));
         if (currentLine) currentLine.replaceWith(nextLine);
         else items.append(nextLine);
       });
@@ -378,7 +383,10 @@
 
     updateHeaderCount(cart);
     updateShippingProgress(cart);
-    await loadRecommendations(cart);
+    const recommendationsPromise = loadRecommendations(cart);
+    if (!awaitRecommendations) recommendationsPromise.catch(() => {});
+    else await recommendationsPromise;
+    if (state.drawer !== drawer || state.cartRevision !== revision) return;
     document.dispatchEvent(new CustomEvent('cart:updated', { detail: { cart, source: 'cart-drawer' } }));
   };
 
@@ -388,19 +396,6 @@
     element.textContent = message;
     element.dataset.error = String(isError);
     element.hidden = !message;
-  };
-
-  const updateRecommendationDot = (forcedIndex = null) => {
-    const list = state.drawer?.querySelector('[data-cart-drawer-recommendation-list]');
-    const dots = state.drawer?.querySelectorAll('[data-cart-drawer-recommendation-dot]');
-    if (!list || !dots?.length) return;
-    const slides = Array.from(list.children);
-    const index = forcedIndex ?? slides.reduce((closest, slide, slideIndex) => {
-      const currentDistance = Math.abs(slide.offsetLeft - list.scrollLeft);
-      const closestDistance = Math.abs(slides[closest].offsetLeft - list.scrollLeft);
-      return currentDistance < closestDistance ? slideIndex : closest;
-    }, 0);
-    dots.forEach((dot, dotIndex) => dot.setAttribute('aria-current', String(dotIndex === index)));
   };
 
   const hideRecommendations = () => {
@@ -413,29 +408,30 @@
     const drawer = state.drawer;
     const recommendations = drawer?.querySelector('[data-cart-drawer-recommendations]');
     const list = drawer?.querySelector('[data-cart-drawer-recommendation-list]');
-    const dots = drawer?.querySelector('[data-cart-drawer-recommendation-dots]');
-    if (!recommendations || !list || !dots) return;
+    if (!recommendations || !list) return;
     const recommendationIcon = drawer.dataset.recommendationIcon || '';
+    const wrapper = list.querySelector(':scope > .swiper-wrapper');
+    if (!wrapper) return;
 
-    list.innerHTML = products.map((product) => {
+    wrapper.innerHTML = products.map((product) => {
       const variantId = product.variants?.[0]?.id || '';
       const image = product.featured_image || product.images?.[0] || '';
       const imageMarkup = image
         ? `<img src="${escapeHtml(image)}" alt="${escapeHtml(product.title)}" loading="lazy">`
         : '';
-      return `<article class="cart-drawer__recommendation">
-        <a class="cart-drawer__recommendation-media" href="${escapeHtml(product.url)}" aria-label="${escapeHtml(product.title)}">${imageMarkup}</a>
-        <div class="cart-drawer__recommendation-info">
-          <a class="cart-drawer__recommendation-title card-title-text" href="${escapeHtml(product.url)}">${escapeHtml(product.title)}</a>
-          <span class="cart-drawer__recommendation-price card-price-text body-sm">${formatMoney(product.price, currency)}</span>
-        </div>
-        <button class="icon-button cart-drawer__recommendation-add" type="button" data-cart-related-add data-variant-id="${escapeHtml(variantId)}" aria-label="Add ${escapeHtml(product.title)} to cart">${recommendationIcon}</button>
-      </article>`;
+      return `<div class="swiper-slide">
+        <article class="cart-drawer__recommendation">
+          <a class="cart-drawer__recommendation-media" href="${escapeHtml(product.url)}" aria-label="${escapeHtml(product.title)}">${imageMarkup}</a>
+          <div class="cart-drawer__recommendation-info">
+            <a class="cart-drawer__recommendation-title card-title-text" href="${escapeHtml(product.url)}">${escapeHtml(product.title)}</a>
+            <span class="cart-drawer__recommendation-price card-price-text body-sm">${formatMoney(product.price, currency)}</span>
+          </div>
+          <button class="icon-button cart-drawer__recommendation-add" type="button" data-cart-related-add data-variant-id="${escapeHtml(variantId)}" aria-label="Add ${escapeHtml(product.title)} to cart">${recommendationIcon}</button>
+        </article>
+      </div>`;
     }).join('');
 
-    dots.innerHTML = products.map((product, index) => `<button class="cart-drawer__recommendation-dot" type="button" data-cart-drawer-recommendation-dot data-index="${index}" aria-label="View related product ${index + 1}" aria-current="${index === 0 ? 'true' : 'false'}"></button>`).join('');
     recommendations.hidden = false;
-    updateRecommendationDot(0);
   };
 
   const loadRecommendations = async (cart) => {
@@ -462,6 +458,7 @@
       });
       if (!response.ok) throw new Error('Recommendations unavailable');
       const data = await response.json();
+      if (state.drawer !== drawer || state.cart !== cart) return;
       const products = (data.products || []).filter((product) => !cart.items.some((item) => item.product_id === product.id));
       if (!products.length) {
         hideRecommendations();
@@ -470,7 +467,7 @@
       renderRecommendations(products.slice(0, limit), cart.currency || 'USD');
       state.recommendationProductId = productId;
     } catch (error) {
-      hideRecommendations();
+      if (state.drawer === drawer && state.cart === cart) hideRecommendations();
     }
   };
 
@@ -485,16 +482,21 @@
     return response.json();
   };
 
-  const syncMutation = async (payload) => {
+  const syncMutation = async (payload, options) => {
+    const drawer = state.drawer;
     const cart = payload?.items && Number.isFinite(payload?.item_count) ? payload : await fetchCart();
-    await updateCartUI(cart);
+    if (state.drawer !== drawer) return;
+    await updateCartUI(cart, options);
   };
 
   const refresh = async () => {
     const drawer = state.drawer;
-    if (!drawer) return;
+    if (!drawer || state.request) return;
+    const revision = state.cartRevision;
 
-    await updateCartUI(await fetchCart());
+    const cart = await fetchCart();
+    if (state.drawer !== drawer || state.request || state.cartRevision !== revision) return;
+    await updateCartUI(cart);
   };
 
   const findQuantityInput = (lineKey) => Array.from(state.drawer?.querySelectorAll('[data-cart-quantity-input]') || [])
@@ -543,15 +545,34 @@
     }
   };
 
-  const addFormToCart = async (form) => {
+  const addFormToCart = async (form, submitter) => {
     if (!state.drawer || state.request) return;
+    if (form.dataset.variantAvailable === 'false' || submitter?.disabled) return;
     const formData = new FormData(form);
     if (!formData.get('id')) return;
+    const drawer = state.drawer;
+    const opener = submitter || document.activeElement;
+    const buttons = Array.from(form.querySelectorAll('[type="submit"]'));
+    const disabledStates = buttons.map((button) => button.disabled);
+    const loadingDots = buttons.map((button) => button.querySelector('[data-loading-dots]'));
+    let formError = form.querySelector('[data-cart-add-error]');
+    if (formError) formError.hidden = true;
     const fallbackError = state.drawer.dataset.cartAddError || 'Unable to add this item';
 
-    open({ focus: false });
+    form.setAttribute('aria-busy', 'true');
+    buttons.forEach((button, index) => {
+      button.disabled = true;
+      button.setAttribute('aria-busy', 'true');
+      const dots = loadingDots[index];
+      if (dots) {
+        dots.hidden = false;
+        dots.classList.remove('hidden');
+        button.dataset.quickAddLoading = 'true';
+      }
+    });
     setLoading(true);
     setError();
+    state.cartRevision += 1;
     state.request = fetch(endpoint(state.drawer.dataset.cartAddUrl), {
       method: 'POST',
       headers: { Accept: 'application/json' },
@@ -561,12 +582,44 @@
     try {
       const response = await state.request;
       if (!response.ok) throw new Error((await parseError(response)) || fallbackError);
-      await syncMutation(await response.json());
+      const payload = await response.json();
+      if (state.drawer !== drawer) return;
+      await syncMutation(payload, { awaitRecommendations: false });
+      if (state.drawer !== drawer) return;
+      // Overlay owners close only after the cart DOM is ready and provide an
+      // external opener so closing the drawer never focuses a hidden modal.
+      const detail = { form, opener };
+      document.dispatchEvent(new CustomEvent('cart:add:ready', { detail }));
+      state.opener = detail.opener;
+      setLoading(false);
+      open({ refreshCart: false });
     } catch (error) {
-      setError(error.message || fallbackError);
+      if (state.drawer === drawer) setError(error.message || fallbackError);
+      if (form.isConnected) {
+        if (!formError) {
+          formError = document.createElement('p');
+          formError.setAttribute('data-cart-add-error', '');
+          formError.setAttribute('role', 'alert');
+          form.append(formError);
+        }
+        formError.textContent = error.message || fallbackError;
+        formError.hidden = false;
+      }
     } finally {
       state.request = null;
-      setLoading(false);
+      form.removeAttribute('aria-busy');
+      buttons.forEach((button, index) => {
+        button.disabled = button.dataset.variantAvailable != null
+          ? button.dataset.variantAvailable !== 'true' : disabledStates[index];
+        button.removeAttribute('aria-busy');
+        delete button.dataset.quickAddLoading;
+        const dots = loadingDots[index];
+        if (dots) {
+          dots.hidden = true;
+          dots.classList.add('hidden');
+        }
+      });
+      if (state.drawer === drawer) setLoading(false);
     }
   };
 
@@ -700,84 +753,37 @@
     const panel = drawer?.querySelector('[data-cart-drawer-order-options]');
     if (!drawer || !panel) return;
     const isOpen = Boolean(name);
+    const previousTrigger = drawer.querySelector('[data-cart-drawer-order-options-open][aria-expanded="true"]');
+    if (!isOpen && panel.contains(document.activeElement)) previousTrigger?.focus({ preventScroll: true });
+    panel.inert = !isOpen;
     drawer.classList.toggle('is-order-options-open', isOpen);
     panel.setAttribute('aria-hidden', String(!isOpen));
     drawer.querySelectorAll('[data-cart-drawer-order-options-open]').forEach((trigger) => {
       trigger.setAttribute('aria-expanded', String(isOpen && trigger.dataset.cartDrawerOrderOptionsOpen === name));
     });
+    if (!isOpen) return;
+    state.orderOptionsDrag?.reset();
     drawer.querySelectorAll('[data-cart-drawer-order-options-content]').forEach((content) => {
       content.hidden = content.dataset.cartDrawerOrderOptionsContent !== name;
     });
-    if (!isOpen) return;
     const trigger = drawer.querySelector(`[data-cart-drawer-order-options-open="${name}"]`);
     const title = panel.querySelector('[data-cart-drawer-order-options-title]');
     if (title) title.textContent = trigger?.dataset.cartDrawerOrderOptionsTitle || 'Cart options';
-    window.requestAnimationFrame(() => panel.querySelector(`[data-cart-drawer-order-options-content="${name}"] input, [data-cart-drawer-order-options-content="${name}"] textarea, [data-cart-drawer-order-options-content="${name}"] select, [data-cart-drawer-order-options-close]`)?.focus({ preventScroll: true }));
-  };
-
-  const resetOrderOptionsDrag = () => {
-    const drag = state.orderOptionsDrag;
-    if (!drag) return;
-    drag.panel.classList.remove('is-sheet-dragging');
-    drag.panel.style.removeProperty('transition');
-    drag.panel.style.removeProperty('transform');
-    state.orderOptionsDrag = null;
+    window.requestAnimationFrame(() => panel.querySelector(`[data-cart-drawer-order-options-content="${name}"] input, [data-cart-drawer-order-options-content="${name}"] textarea, [data-cart-drawer-order-options-content="${name}"] select`)?.focus({ preventScroll: true }));
   };
 
   const beginOrderOptionsDrag = (event) => {
-    if (window.innerWidth > 767 || !event.isPrimary || event.button !== 0) return;
-    const header = event.target instanceof Element
-      ? event.target.closest('[data-cart-drawer-order-options-sheet-header]')
-      : null;
-    if (!header || event.target.closest('[data-cart-drawer-order-options-close]')) return;
-    const panel = header.closest('[data-cart-drawer-order-options]');
-    if (!panel || !state.drawer?.classList.contains('is-order-options-open')) return;
-
-    state.orderOptionsDrag = {
-      panel,
-      header,
-      pointerId: event.pointerId,
-      startY: event.clientY,
-      lastY: event.clientY,
-      lastTime: performance.now(),
-      velocity: 0,
-    };
-    panel.classList.add('is-sheet-dragging');
-    panel.style.transition = 'none';
-    header.setPointerCapture?.(event.pointerId);
-    event.preventDefault();
-  };
-
-  const moveOrderOptionsDrag = (event) => {
-    const drag = state.orderOptionsDrag;
-    if (!drag || event.pointerId !== drag.pointerId) return;
-    const distance = Math.max(0, event.clientY - drag.startY);
-    const now = performance.now();
-    drag.velocity = (event.clientY - drag.lastY) / Math.max(1, now - drag.lastTime);
-    drag.lastY = event.clientY;
-    drag.lastTime = now;
-    drag.panel.style.transform = `translate3d(0, ${distance}px, 0)`;
-    event.preventDefault();
-  };
-
-  const endOrderOptionsDrag = (event, cancelled = false) => {
-    const drag = state.orderOptionsDrag;
-    if (!drag || event.pointerId !== drag.pointerId) return;
-    const distance = Math.max(0, event.clientY - drag.startY);
-    const shouldClose = !cancelled && (distance >= Math.min(140, window.innerHeight * 0.2) || (distance >= 32 && drag.velocity > 0.55));
-    drag.header.releasePointerCapture?.(event.pointerId);
-    if (shouldClose) {
-      drag.panel.style.transition = 'transform var(--motion-duration-standard) var(--motion-ease-standard)';
-      drag.panel.style.transform = 'translate3d(0, 100%, 0)';
-      window.setTimeout(() => {
-        setOrderOptionsOpen();
-        resetOrderOptionsDrag();
-      }, 280);
-      return;
-    }
-    drag.panel.style.transition = 'transform var(--motion-duration-standard) var(--motion-ease-standard)';
-    drag.panel.style.transform = 'translate3d(0, 0, 0)';
-    window.setTimeout(resetOrderOptionsDrag, 360);
+    const panel = event.target.closest?.('[data-cart-drawer-order-options]');
+    const header = panel?.querySelector('[data-cart-drawer-order-options-sheet-header]');
+    const backdrop = panel?.closest?.('[data-cart-drawer]')?.querySelector('[data-cart-drawer-order-options-backdrop]');
+    if (!panel || !window.ThemeOverlay.mobile.matches) return;
+    state.orderOptionsDrag?.destroy();
+    state.orderOptionsDrag = new window.ThemeOverlay.SheetGesture({
+      panel, header, backdrop, delegated: true,
+      enabled: () => state.drawer?.classList.contains('is-order-options-open') && window.ThemeOverlay.mobile.matches,
+      close: () => setOrderOptionsOpen(),
+    });
+    state.orderOptionsDrag.start(event);
   };
 
   const estimateShipping = async (form) => {
@@ -789,11 +795,29 @@
     output.textContent = state.drawer.dataset.cartShippingCalculating || 'Calculating shipping…';
     output.removeAttribute('data-error');
     const query = new URLSearchParams({ 'shipping_address[country]': country, 'shipping_address[zip]': zip });
+    const localeRoot = window.Shopify?.routes?.root || '/';
+    const cartRoot = `${localeRoot.endsWith('/') ? localeRoot : `${localeRoot}/`}cart/`;
+    const unavailableMessage = state.drawer.dataset.cartShippingUnavailable || 'Shipping rates unavailable.';
     setLoading(true);
     try {
-      const response = await fetch(`/cart/async_shipping_rates.json?${query.toString()}`, { headers: { Accept: 'application/json' }, credentials: 'same-origin' });
-      if (!response.ok) throw new Error('Shipping rates unavailable.');
-      const data = await response.json();
+      const prepare = await fetch(`${cartRoot}prepare_shipping_rates.json?${query.toString()}`, {
+        method: 'POST',
+        headers: { Accept: 'application/json' },
+        credentials: 'same-origin',
+      });
+      if (!prepare.ok) throw new Error(unavailableMessage);
+
+      let data = null;
+      for (let attempt = 0; attempt < 8 && data == null; attempt += 1) {
+        if (attempt > 0) await new Promise((resolve) => window.setTimeout(resolve, 500));
+        const response = await fetch(`${cartRoot}async_shipping_rates.json?${query.toString()}`, {
+          headers: { Accept: 'application/json' },
+          credentials: 'same-origin',
+        });
+        if (!response.ok) throw new Error(unavailableMessage);
+        data = await response.json();
+      }
+      if (data == null) throw new Error(unavailableMessage);
       const rates = data.shipping_rates || data.rates || [];
       if (!rates.length) throw new Error(state.drawer.dataset.cartShippingNoRates || 'No shipping rates found.');
       output.innerHTML = rates.map((rate) => `<p>${escapeHtml(rate.presentment_name || rate.name)}: ${formatMoney(Math.round(Number(rate.price || 0) * 100), state.drawer.dataset.currency || 'USD')}</p>`).join('');
@@ -805,59 +829,27 @@
     }
   };
 
-  const getFocusable = () => Array.from(state.drawer?.querySelectorAll(
-    'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
-  ) || []).filter((element) => !element.hidden && element.offsetParent !== null);
-
-  const open = ({ focus = true } = {}) => {
+  const open = ({ refreshCart = true } = {}) => {
     const drawer = state.drawer;
     if (!drawer) return;
-    const shouldAnimate = !drawer.classList.contains('is-open');
-    window.clearTimeout(state.closeTimer);
-    state.closeTimer = null;
-    if (shouldAnimate) {
-      state.previousFocus = document.activeElement;
-    }
-    drawer.hidden = false;
-    drawer.setAttribute('aria-hidden', 'false');
+    const shouldOpen = !state.overlay?.isOpen();
+    if (!shouldOpen) return;
+    const opener = state.editorSelected ? null : (state.opener || document.activeElement);
     drawer.classList.remove('is-closing');
-    if (shouldAnimate) {
-      drawer.classList.remove('is-open');
-      drawer.querySelector('[data-drawer]')?.getBoundingClientRect();
-    }
     drawer.classList.add('is-open');
-    document.documentElement.classList.add('cart-drawer-open');
-    document.body.classList.add('cart-drawer-open');
-    document.querySelectorAll('[data-cart-drawer-open]').forEach((trigger) => trigger.setAttribute('aria-expanded', 'true'));
+    state.overlay?.open({ opener, focus: !state.editorSelected, restoreFocus: !state.editorSelected });
     document.dispatchEvent(new CustomEvent('cart-drawer:open', { detail: { drawer } }));
-    refresh().catch(() => {});
-    if (focus) {
-      window.requestAnimationFrame(() => drawer.querySelector('[data-cart-drawer-close]')?.focus());
-    }
+    if (refreshCart) refresh().catch(() => {});
   };
 
   const close = ({ force = false } = {}) => {
     const drawer = state.drawer;
     if (!drawer || (state.editorSelected && !force)) return;
     setOrderOptionsOpen();
+    if (!state.overlay?.isOpen()) return;
     drawer.classList.remove('is-open');
     drawer.classList.add('is-closing');
-    drawer.setAttribute('aria-hidden', 'true');
-    document.documentElement.classList.remove('cart-drawer-open');
-    document.body.classList.remove('cart-drawer-open');
-    document.querySelectorAll('[data-cart-drawer-open]').forEach((trigger) => trigger.setAttribute('aria-expanded', 'false'));
-    document.dispatchEvent(new CustomEvent('cart-drawer:close', { detail: { drawer } }));
-    window.clearTimeout(state.closeTimer);
-    state.closeTimer = window.setTimeout(() => {
-      if (!drawer.classList.contains('is-open')) {
-        drawer.classList.remove('is-closing');
-        drawer.hidden = true;
-      }
-    }, 350);
-
-    const restoreTarget = state.previousFocus;
-    state.previousFocus = null;
-    if (restoreTarget?.isConnected && !restoreTarget.hidden) restoreTarget.focus();
+    state.overlay.close({ restoreFocus: !state.editorSelected });
   };
 
   const initialize = (nextDrawer) => {
@@ -865,21 +857,20 @@
     if (state.drawer && state.drawer !== nextDrawer) close({ force: true });
     state.drawer = nextDrawer;
     state.sectionRoot = nextDrawer.closest('.shopify-section') || nextDrawer;
+    state.overlay = window.ThemeOverlay?.get(nextDrawer) || null;
     nextDrawer.dataset.cartDrawerReady = 'true';
     seedVariantComparePrices();
 
-    nextDrawer.querySelector('[data-cart-drawer-order-options-sheet-header]')?.addEventListener('pointerdown', beginOrderOptionsDrag);
-    nextDrawer.querySelector('[data-cart-drawer-order-options]')?.addEventListener('pointermove', moveOrderOptionsDrag);
-    nextDrawer.querySelector('[data-cart-drawer-order-options]')?.addEventListener('pointerup', endOrderOptionsDrag);
-    nextDrawer.querySelector('[data-cart-drawer-order-options]')?.addEventListener('pointercancel', (event) => endOrderOptionsDrag(event, true));
+    nextDrawer.addEventListener('close', () => {
+      nextDrawer.classList.remove('is-open', 'is-closing');
+      document.querySelectorAll('[data-cart-drawer-open]').forEach((trigger) => trigger.setAttribute('aria-expanded', 'false'));
+      document.dispatchEvent(new CustomEvent('cart-drawer:close', { detail: { drawer: nextDrawer } }));
+      state.opener = null;
+    });
+
+    nextDrawer.querySelector('[data-cart-drawer-order-options]')?.addEventListener('pointerdown', beginOrderOptionsDrag);
 
     nextDrawer.addEventListener('click', (event) => {
-      if (event.target.closest('[data-cart-drawer-close]')) {
-        event.preventDefault();
-        close({ force: true });
-        return;
-      }
-
       const orderOptionsTrigger = event.target.closest('[data-cart-drawer-order-options-open]');
       if (orderOptionsTrigger) {
         event.preventDefault();
@@ -910,16 +901,6 @@
       if (relatedAdd) {
         event.preventDefault();
         addRecommendation(relatedAdd);
-        return;
-      }
-
-      const recommendationDot = event.target.closest('[data-cart-drawer-recommendation-dot]');
-      if (recommendationDot) {
-        event.preventDefault();
-        const list = nextDrawer.querySelector('[data-cart-drawer-recommendation-list]');
-        const slide = list?.children[Number(recommendationDot.dataset.index)];
-        if (slide) list.scrollTo({ left: slide.offsetLeft, behavior: 'smooth' });
-        updateRecommendationDot(Number(recommendationDot.dataset.index));
         return;
       }
 
@@ -966,11 +947,7 @@
       }
     });
 
-    nextDrawer.addEventListener('scroll', (event) => {
-      if (event.target.matches?.('[data-cart-drawer-recommendation-list]')) updateRecommendationDot();
-    }, { passive: true, capture: true });
-
-    if (state.editorSelected) open({ focus: false });
+    if (state.editorSelected) open();
   };
 
   document.addEventListener('click', (event) => {
@@ -984,60 +961,21 @@
   });
 
   document.addEventListener('submit', (event) => {
+    if (event.defaultPrevented) return;
     const form = event.target.closest?.('form[action*="/cart/add"]');
     if (!form || !state.drawer) return;
     event.preventDefault();
-    addFormToCart(form);
+    addFormToCart(form, event.submitter);
   });
 
   document.addEventListener('keydown', (event) => {
     const drawer = state.drawer;
-    if (!drawer || drawer.hidden || !drawer.classList.contains('is-open')) return;
-    if (event.key === 'Escape') {
-      event.preventDefault();
-      if (drawer.classList.contains('is-order-options-open')) {
-        setOrderOptionsOpen();
-        return;
-      }
-      close({ force: true });
-      return;
-    }
-    if (event.key !== 'Tab') return;
-    const focusable = getFocusable();
-    if (!focusable.length) return;
-    const first = focusable[0];
-    const last = focusable[focusable.length - 1];
-    if (event.shiftKey && document.activeElement === first) {
-      event.preventDefault();
-      last.focus();
-    } else if (!event.shiftKey && document.activeElement === last) {
-      event.preventDefault();
-      first.focus();
-    }
-  });
-
-  document.addEventListener('mousemove', (event) => {
-    const drawer = state.drawer;
-    const pointer = drawer?.querySelector('.cart-drawer__backdrop-pointer');
-    const panel = drawer?.querySelector('[data-drawer]');
-    if (!drawer?.classList.contains('is-open') || drawer.classList.contains('is-closing') || !pointer || !panel || !window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-      pointer?.classList.remove('is-visible');
-      return;
-    }
-    const panelRect = panel.getBoundingClientRect();
-    const overBackdrop = event.clientX < panelRect.left || event.clientX > panelRect.right || event.clientY < panelRect.top || event.clientY > panelRect.bottom;
-    if (!overBackdrop) {
-      pointer.classList.remove('is-visible');
-      return;
-    }
-    pointer.style.setProperty('--cart-drawer-pointer-x', `${event.clientX}px`);
-    pointer.style.setProperty('--cart-drawer-pointer-y', `${event.clientY}px`);
-    pointer.classList.add('is-visible');
-  }, { passive: true });
-
-  document.addEventListener('mouseleave', () => {
-    state.drawer?.querySelector('.cart-drawer__backdrop-pointer')?.classList.remove('is-visible');
-  });
+    if (!drawer || drawer.hidden || !drawer.classList.contains('is-open') || event.key !== 'Escape') return;
+    if (!drawer.classList.contains('is-order-options-open')) return;
+    event.preventDefault();
+    event.stopPropagation();
+    setOrderOptionsOpen();
+  }, true);
 
   document.addEventListener('shopify:section:load', (event) => {
     const nextDrawer = getDrawer(event.target);
@@ -1049,8 +987,13 @@
     const target = event.target;
     if (target === state.sectionRoot || target?.contains?.(state.drawer)) {
       close({ force: true });
+      state.orderOptionsDrag?.destroy();
+      state.orderOptionsDrag = null;
+      state.overlay?.destroy();
       state.drawer = null;
       state.sectionRoot = null;
+      state.overlay = null;
+      state.opener = null;
       state.editorSelected = false;
     }
   });
@@ -1065,7 +1008,7 @@
     if (nextDrawer) initialize(nextDrawer);
     if (!isDrawerEvent(event)) return;
     state.editorSelected = true;
-    open({ focus: false });
+    open();
   });
 
   document.addEventListener('shopify:section:deselect', (event) => {

@@ -5,6 +5,8 @@
   @param {string} card_class - Fully resolved Product Card classes from the shared card component
   @param {string} [attributes] - Theme Editor attributes for the card root
   @param {number} [placeholder_price] - Sample amount in shop currency units
+  @param {string} [middle_content] - Optional HTML after product details
+  @param {string} [footer_content] - Optional HTML at the bottom of card content
 
   @example
   {% render 'product-card-placeholder', card_class: 'product-card product-card--standard' %}
@@ -23,5 +25,11 @@
       {% render 'product-card-title', placeholder: true %}
       {% render 'product-card-price', placeholder: true, placeholder_price: placeholder_price %}
     </div>
+    {% if middle_content != blank %}
+      {{ middle_content }}
+    {% endif %}
+    {% if footer_content != blank %}
+      {{ footer_content }}
+    {% endif %}
   </div>
 </article>
