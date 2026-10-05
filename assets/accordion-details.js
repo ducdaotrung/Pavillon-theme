@@ -92,6 +92,7 @@
   const finishAnimation = (state, animationId) => {
     if (state.animationId !== animationId) return;
 
+    state.animations.forEach((animation) => animation.cancel());
     state.animations = [];
     state.details.open = state.isOpen;
     updateAccessibilityState(state);
@@ -255,17 +256,23 @@
     details.addEventListener('accordion:sync', () => syncExternalState(state), eventOptions);
 
     const handleViewportChange = () => {
-      if (!state.mobileOnly) return;
+      if (!state.mobileOnly) {
+        setStaticState(state, state.isOpen);
+        return;
+      }
 
       const isDesktop = state.desktopQuery.matches;
-      if (state.isDesktop === isDesktop) return;
+      if (state.isDesktop === isDesktop) {
+        setStaticState(state, state.isOpen);
+        return;
+      }
 
       state.isDesktop = isDesktop;
       applyResponsiveState(state);
     };
 
     listenToMediaQuery(desktopQuery, handleViewportChange, controller.signal);
-    if (mobileOnly) window.addEventListener('resize', handleViewportChange, eventOptions);
+    window.addEventListener('resize', handleViewportChange, eventOptions);
 
     listenToMediaQuery(
       state.reducedMotionQuery,

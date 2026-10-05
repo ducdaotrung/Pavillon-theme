@@ -228,6 +228,8 @@
 {% endcapture %}
 
 {% capture carousel_style %}
+  {% if block.settings.limit_width %}--carousel-max-width: {{ block.settings.max_width | default: 1256 | at_least: 1 }}px;{% endif %}
+  {% if block.settings.center_carousel %}--carousel-margin-inline: auto;{% endif %}
   --carousel-padding-top: {{ carousel_padding_top }}px;
   --carousel-padding-bottom: {{ carousel_padding_bottom }}px;
   {% if carousel_customize_mobile_padding %}
@@ -321,7 +323,7 @@
 </div>
 
 {% stylesheet %}
-  .carousel-block { width: var(--carousel-width, 100%); min-width: 0; padding-block: var(--carousel-padding-top) var(--carousel-padding-bottom); }
+  .carousel-block { width: var(--carousel-width, 100%); max-width: var(--carousel-max-width, 100%); margin-inline: var(--carousel-margin-inline, 0); min-width: 0; padding-block: var(--carousel-padding-top) var(--carousel-padding-bottom); }
   .carousel-block__container { position: relative; min-width: 0; }
   .carousel-block__viewport { width: 100%; }
   .carousel-block__viewport > .swiper-wrapper { column-gap: 0; }
@@ -688,6 +690,9 @@
       ],
       "default": "fill"
     },
+    { "type": "checkbox", "id": "limit_width", "label": "t:labels.limit_width", "default": true },
+    { "type": "range", "id": "max_width", "label": "t:labels.max_width", "min": 200, "max": 1800, "step": 16, "unit": "px", "default": 1256, "visible_if": "{{ block.settings.limit_width }}" },
+    { "type": "checkbox", "id": "center_carousel", "label": "Center carousel", "default": true },
     {
       "type": "range",
       "id": "custom_width",

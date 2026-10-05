@@ -34,6 +34,9 @@
     when 'full_width'
       assign custom_section_width = 'full-width'
       assign custom_section_container_width = 'full-width'
+    when 'full_width_no_padding'
+      assign custom_section_width = 'full-width-no-padding'
+      assign custom_section_container_width = 'full-width'
   endcase
 
   assign custom_section_scheme = section.settings.color_scheme | default: 'scheme-1'
@@ -105,6 +108,9 @@
   .custom-section__container {
     position: relative;
     z-index: 1;
+  }
+  .custom-section--full-width-no-padding .custom-section__container {
+    padding-inline: 0;
   }
   .custom-section__background {
     position: absolute;
@@ -178,6 +184,10 @@
         {
           "value": "full_width",
           "label": "t:options.section_width.full_width"
+        },
+        {
+          "value": "full_width_no_padding",
+          "label": "t:options.section_width.full_width_no_padding"
         }
       ],
       "default": "page_width"

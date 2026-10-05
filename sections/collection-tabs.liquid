@@ -136,6 +136,22 @@
 {% endif %}
 
 {% stylesheet %}
+  .collection-tabs__spacing .tab-layout__tab + .tab-layout__tab::before {
+    content: '/';
+    display: var(--collection-tabs-divider-display, none);
+    position: absolute;
+    inset-inline-start: calc(var(--tab-layout-gap-desktop, 16px) / -2);
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: color-mix(in srgb, var(--body-color) 35%, transparent);
+    pointer-events: none;
+  }
+  @media (max-width: 767.98px) {
+    .collection-tabs__spacing .tab-layout__tab + .tab-layout__tab::before {
+      inset-inline-start: calc(var(--tab-layout-gap-mobile, var(--tab-layout-gap-desktop, 16px)) / -2);
+    }
+  }
+
   .collection-tabs__spacing {
     width: 100%;
     min-width: 0;

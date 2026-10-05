@@ -1,6 +1,9 @@
 {% liquid
   assign item_collection = block.settings.collection
   assign item_title = block.settings.custom_title | default: item_collection.title | default: 'Collection title'
+  if section.settings.presentation == 'editorial'
+    assign item_title = item_collection.title | default: 'Select collection'
+  endif
   assign item_image = block.settings.custom_image | default: item_collection.featured_image | default: item_collection.image
   assign item_id = block.id
   assign item_title_tag = section.settings.title_tag | default: 'div'
@@ -48,7 +51,142 @@
         </div>
       {% endif %}
     </div>
+    <div class="collections-with-tabs__intro">
+      {% if section.settings.presentation == 'editorial' or block.settings.intro_content_source == 'collection' %}
+        {% if item_collection != blank %}
+          <h2 class="heading-text heading-md">{{ item_collection.title | escape }}</h2>
+          {% if item_collection.description != blank %}
+            <div class="body-text body-sm rte">{{ item_collection.description }}</div>
+          {% endif %}
+          {% render 'theme-button', label: 'SHOP ALL', url: item_collection.url, variant: 'tertiary' %}
+        {% elsif request.design_mode %}
+          <p class="body-text body-sm">Select a collection to display its title and description.</p>
+        {% endif %}
+      {% else %}
+        {% content_for 'blocks' %}
+      {% endif %}
+    </div>
 </div>
 {% schema %}
-{"name":"Collection","tag":null,"settings":[{"type":"collection","id":"collection","label":"Collection"},{"type":"text","id":"custom_title","label":"Custom title"},{"type":"image_picker","id":"custom_image","label":"Custom image"},{"type":"header","content":"Color"},{"type":"select","id":"color_type","label":"Color type","options":[{"value":"inherit","label":"Inherit"},{"value":"color_scheme","label":"Color scheme"}],"default":"inherit"},{"type":"color_scheme","id":"color_scheme","label":"Color scheme","default":"scheme-1","visible_if":"{{ block.settings.color_type == 'color_scheme' }}"},{"type":"checkbox","id":"custom_background","label":"Custom background","default":false},{"type":"color","alpha":true,"id":"background_color","label":"Background color","default":"#f1f1f1","visible_if":"{{ block.settings.custom_background }}"}],"presets":[{"name":"Collection"}]}
+{
+  "name": "Collection",
+  "tag": null,
+  "settings": [
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "text",
+      "id": "custom_title",
+      "label": "Custom title"
+    },
+    {
+      "type": "image_picker",
+      "id": "custom_image",
+      "label": "Custom image"
+    },
+    {
+      "type": "header",
+      "content": "Color"
+    },
+    {
+      "type": "select",
+      "id": "color_type",
+      "label": "Color type",
+      "options": [
+        {
+          "value": "inherit",
+          "label": "Inherit"
+        },
+        {
+          "value": "color_scheme",
+          "label": "Color scheme"
+        }
+      ],
+      "default": "inherit"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1",
+      "visible_if": "{{ block.settings.color_type == 'color_scheme' }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "custom_background",
+      "label": "Custom background",
+      "default": false
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#f1f1f1",
+      "visible_if": "{{ block.settings.custom_background }}"
+    },
+    {
+      "id": "intro_content_source",
+      "default": "custom",
+      "label": "Introduction content",
+      "type": "select",
+      "options": [
+        {
+          "label": "Selected collection",
+          "value": "collection"
+        },
+        {
+          "label": "Custom blocks",
+          "value": "custom"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection",
+      "category": "t:general.collection",
+      "blocks": [
+        {
+          "settings": {
+            "heading_size": "md",
+            "text": "<p>Discover new<br>Collection</p>"
+          },
+          "type": "heading"
+        },
+        {
+          "settings": {
+            "text": "<p>Explore the collection.</p>"
+          },
+          "type": "text"
+        },
+        {
+          "settings": {
+            "button_label": "SHOP ALL",
+            "button_style": "tertiary",
+            "button_link": "shopify://collections/all"
+          },
+          "type": "button"
+        }
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "type": "heading"
+    },
+    {
+      "type": "text"
+    },
+    {
+      "type": "button"
+    },
+    {
+      "type": "group"
+    }
+  ]
+}
 {% endschema %}

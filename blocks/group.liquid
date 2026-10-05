@@ -14,6 +14,10 @@
 {% enddoc %}
 
 {% liquid
+  assign group_wrap = 'nowrap'
+  if block.settings.wrap_items
+    assign group_wrap = 'wrap'
+  endif
   assign group_direction = block.settings.direction | default: block.settings.layout_direction | default: 'vertical'
   unless group_direction == 'horizontal' or group_direction == 'vertical' or group_direction == 'group--horizontal' or group_direction == 'group--vertical'
     assign group_direction = 'vertical'
@@ -258,6 +262,7 @@
 {% capture group_style %}
   {% render 'layout-flow-group-style',
     direction: group_direction,
+    wrap: group_wrap,
     position: group_position_name,
     alignment: group_alignment,
     horizontal_alignment: group_justify,
@@ -482,6 +487,13 @@
         { "value": "vertical", "label": "t:options.direction.vertical" }
       ],
       "default": "vertical"
+    },
+    {
+      "type": "checkbox",
+      "id": "wrap_items",
+      "label": "Wrap items",
+      "default": false,
+      "visible_if": "{{ block.settings.direction == 'horizontal' }}"
     },
     {
       "type": "select",

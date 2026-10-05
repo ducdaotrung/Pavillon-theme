@@ -2,6 +2,17 @@ const instances = new WeakMap();
 
 const initialize = (section) => {
   if (!section || instances.has(section)) return;
+  if (section.classList.contains('collections-with-tabs--editorial')) {
+    const navigation = section.querySelector('.collections-with-tabs__navigation');
+    if (navigation && !navigation.querySelector('.collections-with-tabs__navigation-column')) {
+      const column = document.createElement('div');
+      column.className = 'collections-with-tabs__navigation-column';
+      [...navigation.children].forEach((child) => {
+        if (child.matches('.block-header, .collections-with-tabs__tab-row')) column.append(child);
+      });
+      navigation.prepend(column);
+    }
+  }
   const tabs = [...section.querySelectorAll('[data-collections-with-tabs-tab]')];
   const panels = [...section.querySelectorAll('[data-collections-with-tabs-panel]')];
   if (!tabs.length || !panels.length) return;
@@ -72,7 +83,7 @@ const initialize = (section) => {
     // Tabs switch on hover. Prevent the pointer interaction from moving focus
     // to the button, which can make the Theme Editor scroll the viewport.
     tab.addEventListener('pointerdown', (event) => event.preventDefault(), { signal: controller.signal });
-    tab.addEventListener('click', (event) => event.preventDefault(), { signal: controller.signal });
+    tab.addEventListener('click', () => activate(tab.dataset.collectionsWithTabsId), { signal: controller.signal });
   });
   section.addEventListener('collections-with-tabs:activate', (event) => {
     activate(event.detail?.id);
@@ -130,7 +141,9 @@ document.addEventListener('shopify:block:select', (event) => {
   const block = event.target.closest?.('[data-shopify-editor-block]');
   const section = block?.closest('[data-collections-with-tabs]');
   const tab = block?.querySelector('[data-collections-with-tabs-tab]');
-  if (!section || !tab) return;
-  section.dispatchEvent(new CustomEvent('collections-with-tabs:activate', { detail: { id: tab.dataset.collectionsWithTabsId } }));
+  const panel = event.target.closest?.('[data-collections-with-tabs-panel]');
+  const id = tab?.dataset.collectionsWithTabsId || panel?.dataset.collectionsWithTabsId;
+  if (!section || !id) return;
+  section.dispatchEvent(new CustomEvent('collections-with-tabs:activate', { detail: { id } }));
 });
 document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', () => initializeRoot(), { once: true }) : initializeRoot();

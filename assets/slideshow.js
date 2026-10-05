@@ -86,7 +86,7 @@ const updateParallax = (root) => {
 
 const paginationOptions = (root) => {
   const element = root.querySelector('[data-slideshow-pagination]');
-  if (!element || element.dataset.paginationType === 'progress_bar' || element.dataset.paginationType === 'numbers') return {};
+  if (!element || ['progress_bar', 'numbers', 'fraction'].includes(element.dataset.paginationType)) return {};
   return {
     pagination: {
       el: element,
@@ -268,12 +268,33 @@ const createNumberedPagination = (root, swiper, loop, slideCount) => {
   };
 };
 
+const createFractionPagination = (root, swiper, loop, slideCount) => {
+  const element = root.querySelector('[data-slideshow-pagination]');
+  if (!element || element.dataset.paginationType !== 'fraction' || slideCount < 1) return null;
+  const update = () => {
+    if (swiper.destroyed) return;
+    const index = loop ? loop.logicalIndex(swiper.activeIndex) : swiper.params.loop ? swiper.realIndex : swiper.activeIndex;
+    const current = normalizePaginationIndex(index, slideCount) + 1;
+    element.textContent = `${current}/${slideCount}`;
+    element.setAttribute('aria-label', `Slide ${current} of ${slideCount}`);
+  };
+  const events = ['activeIndexChange', 'realIndexChange', 'slideChangeTransitionEnd'];
+  events.forEach((name) => swiper.on(name, update));
+  update();
+  return { destroy() {
+    events.forEach((name) => swiper.off(name, update));
+    element.replaceChildren();
+    element.removeAttribute('aria-label');
+  } };
+};
+
 const createLoopPagination = (root, swiper, loop, slideCount) => {
   const element = root.querySelector('[data-slideshow-pagination]');
   if (!element || !loop) return null;
   const type = element.dataset.paginationType;
   if (type === 'progress_bar') return createSegmentedPagination(root, swiper, loop, slideCount);
   if (type === 'numbers') return createNumberedPagination(root, swiper, loop, slideCount);
+  if (type === 'fraction') return createFractionPagination(root, swiper, loop, slideCount);
   const controller = new AbortController();
   const update = () => {
     const current = loop.logicalIndex(swiper.activeIndex);
@@ -421,7 +442,7 @@ const init = (root) => {
   const fade = !showNextSlidePreview && root.dataset.transition === 'fade';
   const autoplay = root.dataset.autoplay === 'true' && !reducedMotion();
   const paginationType = root.querySelector('[data-slideshow-pagination]')?.dataset.paginationType;
-  const paginationModules = paginationType === 'progress_bar' || paginationType === 'numbers' ? [] : [Pagination];
+  const paginationModules = ['progress_bar', 'numbers', 'fraction'].includes(paginationType) ? [] : [Pagination];
   const options = {
     modules: manualLoop ? [] : (fade ? [EffectFade, ...paginationModules] : paginationModules),
     slidesPerView: 1,
@@ -447,7 +468,9 @@ const init = (root) => {
   }
   const customPagination = manualLoop
     ? createLoopPagination(root, swiper, manualLoop, slideCount)
-    : paginationType === 'numbers'
+    : paginationType === 'fraction'
+      ? createFractionPagination(root, swiper, null, slideCount)
+      : paginationType === 'numbers'
       ? createNumberedPagination(root, swiper, null, slideCount)
       : createSegmentedPagination(root, swiper, null, slideCount);
   if (manualLoop) {
