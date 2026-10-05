@@ -10,6 +10,10 @@
   if block.settings.limit_width
     assign faq_accordion_max_width_css = block.settings.max_width | default: 1100 | append: 'px'
   endif
+  assign faq_question_tag = block.settings.question_tag | default: 'h4'
+  unless faq_question_tag == 'span' or faq_question_tag == 'h2' or faq_question_tag == 'h3' or faq_question_tag == 'h4' or faq_question_tag == 'h5' or faq_question_tag == 'h6'
+    assign faq_question_tag = 'h4'
+  endunless
   assign faq_question_font_size = block.settings.question_font_size | default: 'xs'
   assign faq_answer_font_size = block.settings.answer_font_size | default: 'md'
   assign faq_question_font_size_mobile = block.settings.question_font_size_mobile | default: faq_question_font_size
@@ -93,7 +97,10 @@
 
 <div class="faq-accordion size-style faq-accordion--width-{{ faq_accordion_width }} faq-accordion--style-{{ faq_accordion_style }} faq-accordion--icon-{{ faq_accordion_icon }}{% if block.settings.dividers %} faq-accordion--dividers{% endif %}{% if faq_accordion_style == 'boxed' %} color-scheme {{ faq_accordion_scheme }}{% endif %}" style="{{ faq_accordion_style_attribute | strip }}" {{ block.shopify_attributes }}>
   <div class="faq-accordion__items">
-    {% content_for 'blocks' %}
+    {% capture faq_items %}{% content_for 'blocks' %}{% endcapture %}
+    {% assign faq_question_open = '<' | append: faq_question_tag | append: ' class="faq-item__question">' %}
+    {% assign faq_question_close = '</' | append: faq_question_tag | append: '>' %}
+    {{ faq_items | replace: '<span class="faq-item__question">', faq_question_open | replace: '</span><!-- faq-question-end -->', faq_question_close }}
   </div>
 </div>
 
@@ -133,6 +140,7 @@
     { "type": "select", "id": "icon", "label": "Icon", "options": [{ "value": "chevron", "label": "Chevron" }, { "value": "plus", "label": "Plus" }], "default": "chevron" },
     { "type": "checkbox", "id": "dividers", "label": "Show dividers", "default": true, "visible_if": "{{ block.settings.style == 'simple' }}" },
     { "type": "header", "content": "Font size" },
+    { "type": "select", "id": "question_tag", "label": "Question tag", "options": [{ "value": "span", "label": "Text" }, { "value": "h2", "label": "H2" }, { "value": "h3", "label": "H3" }, { "value": "h4", "label": "H4" }, { "value": "h5", "label": "H5" }, { "value": "h6", "label": "H6" }], "default": "h4" },
     { "type": "select", "id": "question_font_size", "label": "Question", "options": [{ "value": "display", "label": "t:options.heading_size.display" }, { "value": "xl", "label": "t:options.heading_size.xl" }, { "value": "lg", "label": "t:options.heading_size.lg" }, { "value": "md", "label": "t:options.heading_size.md" }, { "value": "sm", "label": "t:options.heading_size.sm" }, { "value": "xs", "label": "t:options.heading_size.xs" }], "default": "xs" },
     { "type": "select", "id": "answer_font_size", "label": "Answer", "options": [{ "value": "xs", "label": "t:options.text_size.xs" }, { "value": "sm", "label": "t:options.text_size.sm" }, { "value": "md", "label": "t:options.text_size.md" }, { "value": "lg", "label": "t:options.text_size.lg" }, { "value": "xl", "label": "t:options.text_size.xl" }, { "value": "xxl", "label": "t:options.text_size.xxl" }], "default": "md" },
     { "type": "checkbox", "id": "customize_mobile_font_size", "label": "Customize for mobile", "default": false },
