@@ -2605,6 +2605,7 @@
                 "image-3": {
                   "type": "image",
                   "settings": {
+                    "image": "shopify://shop_images/pavillon-proof-3.png",
                     "show_image_first_mobile": false,
                     "image_link": "",
                     "open_in_new_tab": false,
@@ -2733,7 +2734,7 @@
                     "text-7": {
                       "type": "text",
                       "settings": {
-                        "text": "<p>Share a customer testimonial that builds trust in your products and brand.</p>",
+                        "text": "<p>\"I wore this ring to my wedding, my sister's wedding, and now my daughter is borrowing it for hers. That says everything.\"<br/><br/></p>",
                         "text_size": "md",
                         "height_limit": "none",
                         "text_color": "",
@@ -2757,7 +2758,7 @@
                     "heading-8": {
                       "type": "heading",
                       "settings": {
-                        "text": "<p>— Customer name</p>",
+                        "text": "<p>—<em> James T.</em></p>",
                         "heading_size": "xs",
                         "custom_heading_size": 24,
                         "html_tag": "h5",
@@ -2813,6 +2814,7 @@
                 "image-10": {
                   "type": "image",
                   "settings": {
+                    "image": "shopify://shop_images/pavillon-proof-4.png",
                     "show_image_first_mobile": false,
                     "image_link": "",
                     "open_in_new_tab": false,
@@ -2941,7 +2943,7 @@
                     "text-14": {
                       "type": "text",
                       "settings": {
-                        "text": "<p>Share a customer testimonial that builds trust in your products and brand.</p>",
+                        "text": "<p>\"The photography doesn't do it justice. In person, the Margot Necklace catches light in a way I've never seen from any piece I've owned before.\"<br/><br/></p>",
                         "text_size": "md",
                         "height_limit": "none",
                         "text_color": "",
@@ -2965,7 +2967,7 @@
                     "heading-15": {
                       "type": "heading",
                       "settings": {
-                        "text": "<p>— Customer name</p>",
+                        "text": "<p>—<em> Olivia B.</em></p>",
                         "heading_size": "xs",
                         "custom_heading_size": 24,
                         "html_tag": "h5",
@@ -3021,6 +3023,7 @@
                 "image-17": {
                   "type": "image",
                   "settings": {
+                    "image": "shopify://shop_images/pavillon-proof-5.png",
                     "show_image_first_mobile": false,
                     "image_link": "",
                     "open_in_new_tab": false,
@@ -3149,7 +3152,7 @@
                     "text-21": {
                       "type": "text",
                       "settings": {
-                        "text": "<p>Share a customer testimonial that builds trust in your products and brand.</p>",
+                        "text": "<p>\"My fiancée cried when she opened the box. I'm not sure if it was the ring or the handwritten note, but either way — thank you, Pavillon.\"<br/><br/></p>",
                         "text_size": "md",
                         "height_limit": "none",
                         "text_color": "",
@@ -3173,7 +3176,7 @@
                     "heading-22": {
                       "type": "heading",
                       "settings": {
-                        "text": "<p>— Customer name</p>",
+                        "text": "<p>—<em> Daniel W.</em></p>",
                         "heading_size": "xs",
                         "custom_heading_size": 24,
                         "html_tag": "h5",
