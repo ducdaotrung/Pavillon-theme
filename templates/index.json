@@ -1673,7 +1673,7 @@
                       "type": "heading",
                       "settings": {
                         "text": "<p>The Art of <em>Giving Well</em></p>",
-                        "heading_size": "lg",
+                        "heading_size": "display",
                         "custom_heading_size": 24,
                         "html_tag": "h2",
                         "text_color": "",
