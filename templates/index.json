@@ -1131,7 +1131,7 @@
                 "heading": {
                   "type": "heading",
                   "settings": {
-                    "text": "<p>Diamond statement</p>",
+                    "text": "<p>DIAMOND</p>",
                     "heading_size": "display",
                     "custom_heading_size": 24,
                     "html_tag": "div",
@@ -1156,6 +1156,7 @@
                 "image": {
                   "type": "image",
                   "settings": {
+                    "image": "shopify://shop_images/pavillon-scrolling-1.png",
                     "show_image_first_mobile": false,
                     "image_link": "",
                     "open_in_new_tab": false,
@@ -1226,7 +1227,7 @@
                 "heading": {
                   "type": "heading",
                   "settings": {
-                    "text": "<p>Birthstone</p>",
+                    "text": "<p>STATEMENT</p>",
                     "heading_size": "display",
                     "custom_heading_size": 24,
                     "html_tag": "div",
@@ -1251,6 +1252,7 @@
                 "image": {
                   "type": "image",
                   "settings": {
+                    "image": "shopify://shop_images/pavillon-scrolling-2.png",
                     "show_image_first_mobile": false,
                     "image_link": "",
                     "open_in_new_tab": false,
@@ -1321,7 +1323,7 @@
                 "heading": {
                   "type": "heading",
                   "settings": {
-                    "text": "<p>Diamond details</p>",
+                    "text": "<p>BIRTHSTONE</p>",
                     "heading_size": "display",
                     "custom_heading_size": 24,
                     "html_tag": "div",
@@ -1346,6 +1348,7 @@
                 "image": {
                   "type": "image",
                   "settings": {
+                    "image": "shopify://shop_images/pavillon-scrolling-3.png",
                     "show_image_first_mobile": false,
                     "image_link": "",
                     "open_in_new_tab": false,
@@ -1384,12 +1387,109 @@
                 "heading",
                 "image"
               ]
+            },
+            "marquee_item_6ckFzL": {
+              "type": "marquee-item",
+              "settings": {
+                "direction": "horizontal",
+                "position": "center",
+                "horizontal_alignment": "left",
+                "customize_mobile_alignment": false,
+                "alignment_mobile": "left",
+                "alignment": "left",
+                "gap_desktop": 72,
+                "gap_mobile": 56,
+                "border_type": "none",
+                "border_color": "",
+                "corner_radius": "square",
+                "shadow": "none",
+                "overlay_color": "",
+                "backdrop_blur": 0,
+                "padding_top": 0,
+                "padding_bottom": 0,
+                "padding_left": 0,
+                "padding_right": 0,
+                "customize_mobile_padding": false,
+                "padding_top_mobile": 0,
+                "padding_bottom_mobile": 0,
+                "padding_left_mobile": 0,
+                "padding_right_mobile": 0
+              },
+              "blocks": {
+                "heading_tqnLhQ": {
+                  "type": "heading",
+                  "settings": {
+                    "text": "<p>LETTER</p>",
+                    "heading_size": "display",
+                    "custom_heading_size": 24,
+                    "html_tag": "div",
+                    "text_color": "",
+                    "width": "fit",
+                    "max_width": 640,
+                    "customize_mobile_size": false,
+                    "width_mobile": "fit",
+                    "max_width_mobile": 480,
+                    "padding_top": 0,
+                    "padding_bottom": 0,
+                    "padding_left": 0,
+                    "padding_right": 0,
+                    "customize_mobile_padding": false,
+                    "padding_top_mobile": 0,
+                    "padding_bottom_mobile": 0,
+                    "padding_left_mobile": 0,
+                    "padding_right_mobile": 0
+                  },
+                  "blocks": {}
+                },
+                "image_Uk4xxq": {
+                  "type": "image",
+                  "settings": {
+                    "image": "shopify://shop_images/pavillon-scrolling-4.png",
+                    "show_image_first_mobile": false,
+                    "image_link": "",
+                    "open_in_new_tab": false,
+                    "alt_text": "",
+                    "device": "desktop",
+                    "image_ratio_desktop": "custom",
+                    "image_ratio_custom_width_desktop": 2,
+                    "image_ratio_custom_height_desktop": 1,
+                    "width_desktop": "fit",
+                    "width_custom_desktop": 100,
+                    "limit_width_desktop": false,
+                    "max_width_desktop": 1600,
+                    "image_ratio_mobile": "custom",
+                    "image_ratio_custom_width_mobile": 2,
+                    "image_ratio_custom_height_mobile": 1,
+                    "width_mobile": "fit",
+                    "width_custom_mobile": 100,
+                    "limit_width_mobile": false,
+                    "max_width_mobile": 1600,
+                    "corner_radius": "full",
+                    "custom_corner_radius": 0,
+                    "padding_top": 0,
+                    "padding_bottom": 0,
+                    "padding_left": 0,
+                    "padding_right": 0,
+                    "customize_mobile_padding": false,
+                    "padding_top_mobile": 0,
+                    "padding_bottom_mobile": 0,
+                    "padding_left_mobile": 0,
+                    "padding_right_mobile": 0
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "heading_tqnLhQ",
+                "image_Uk4xxq"
+              ]
             }
           },
           "block_order": [
             "diamond-statement",
             "birthstone",
-            "diamond-details"
+            "diamond-details",
+            "marquee_item_6ckFzL"
           ]
         }
       },
