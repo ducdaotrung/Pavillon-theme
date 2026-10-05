@@ -113,20 +113,14 @@
   .faq-accordion--style-simple.faq-accordion--dividers .faq-item:first-child { border-top: 1px solid var(--border-color); }
   .faq-accordion--style-boxed .faq-item { border: var(--faq-item-border-width, 1px) solid var(--border-color); border-radius: var(--radius-square); background: var(--background-color); box-shadow: var(--faq-item-shadow, none); }
   .faq-accordion--style-boxed .faq-item__summary { padding: var(--faq-item-padding-top, 16px) var(--faq-item-padding-right, 20px) var(--faq-item-padding-bottom, 16px) var(--faq-item-padding-left, 20px); }
-  .faq-accordion--style-boxed .faq-item__content-inner { padding: 0 var(--faq-item-padding-right, 20px) var(--faq-item-padding-bottom, 16px) var(--faq-item-padding-left, 20px); }
-  .faq-accordion .faq-item__question { font-size: var(--faq-item-question-size, inherit); }
-  .faq-accordion .faq-item__content-inner .faq-answer-text { font-size: var(--faq-item-answer-size, inherit); }
-  .faq-accordion--icon-chevron .faq-item__expand-icon::before,
+  .faq-accordion--style-boxed .faq-item__content-inner { padding: 0 var(--faq-item-padding-right, 20px) var(--faq-item-padding-bottom, 16px) var(--faq-item-padding-left, 20px); }  .faq-accordion--icon-chevron .faq-item__expand-icon::before,
   .faq-accordion--icon-chevron .faq-item__expand-icon::after { display: none; }
   .faq-accordion--icon-chevron .faq-item__expand-icon { display: grid; width: 20px; height: 20px; border: 0; place-items: center; }
   .faq-accordion--icon-chevron .faq-item__expand-icon svg { display: block; transition: transform var(--motion-duration-standard) var(--motion-ease-standard); }
   .faq-accordion--icon-chevron .faq-item[open] .faq-item__expand-icon svg { transform: rotate(180deg); }
   @media (max-width: 767.98px) {
     .faq-accordion__items { gap: var(--faq-item-gap-mobile, var(--faq-item-gap, 16px)); }
-    .faq-accordion--style-simple .faq-accordion__items { gap: 0; }
-    .faq-accordion .faq-item__question { font-size: var(--faq-item-question-size-mobile, var(--faq-item-question-size, inherit)); }
-    .faq-accordion .faq-item__content-inner .faq-answer-text { font-size: var(--faq-item-answer-size-mobile, var(--faq-item-answer-size, inherit)); }
-  }
+    .faq-accordion--style-simple .faq-accordion__items { gap: 0; }  }
   @media (prefers-reduced-motion: reduce) { .faq-accordion--icon-chevron .faq-item__expand-icon svg { transition: none; } }
 {% endstylesheet %}
 
