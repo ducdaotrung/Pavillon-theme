@@ -1860,6 +1860,7 @@
                 "appearance_type": "scheme",
                 "color_scheme": "scheme-2",
                 "background_color": "",
+                "background_image": "shopify://shop_images/pavillon-guide-bg.png",
                 "border_type": "none",
                 "border_color": "",
                 "corner_radius": "square",
@@ -1877,38 +1878,32 @@
                 "padding_right_mobile": 24
               },
               "blocks": {
-                "image-frame": {
-                  "type": "group",
+                "image_YiKkKH": {
+                  "type": "image",
+                  "name": "t:general.image",
                   "settings": {
-                    "direction": "vertical",
-                    "wrap_items": false,
-                    "position": "center",
-                    "position_horizontal": "center",
-                    "horizontal_alignment": "left",
-                    "customize_mobile_alignment": true,
-                    "alignment": "center",
-                    "alignment_mobile": "center",
-                    "gap_desktop": 0,
-                    "gap_mobile": 0,
+                    "image": "shopify://shop_images/pavillon-guide-image.png",
+                    "show_image_first_mobile": false,
+                    "image_link": "",
+                    "open_in_new_tab": false,
+                    "alt_text": "",
                     "device": "desktop",
-                    "width": "fill",
-                    "width_custom": 100,
-                    "limit_width": true,
-                    "max_width": 550,
-                    "height": "fit",
-                    "width_mobile": "fill",
+                    "image_ratio_desktop": "custom",
+                    "image_ratio_custom_width_desktop": 6,
+                    "image_ratio_custom_height_desktop": 7,
+                    "width_desktop": "fit",
+                    "width_custom_desktop": 100,
+                    "limit_width_desktop": false,
+                    "max_width_desktop": 1600,
+                    "image_ratio_mobile": "auto",
+                    "image_ratio_custom_width_mobile": 16,
+                    "image_ratio_custom_height_mobile": 9,
+                    "width_mobile": "fit",
                     "width_custom_mobile": 100,
-                    "limit_width_mobile": true,
-                    "max_width_mobile": 550,
-                    "appearance_type": "inherit",
-                    "color_scheme": "",
-                    "background_color": "",
-                    "border_type": "none",
-                    "border_color": "",
+                    "limit_width_mobile": false,
+                    "max_width_mobile": 1600,
                     "corner_radius": "square",
-                    "shadow": "none",
-                    "overlay_color": "",
-                    "backdrop_blur": 0,
+                    "custom_corner_radius": 0,
                     "padding_top": 0,
                     "padding_bottom": 0,
                     "padding_left": 0,
@@ -1919,51 +1914,11 @@
                     "padding_left_mobile": 0,
                     "padding_right_mobile": 0
                   },
-                  "blocks": {
-                    "image": {
-                      "type": "image",
-                      "settings": {
-                        "show_image_first_mobile": false,
-                        "image_link": "",
-                        "open_in_new_tab": false,
-                        "alt_text": "",
-                        "device": "desktop",
-                        "image_ratio_desktop": "custom",
-                        "image_ratio_custom_width_desktop": 6,
-                        "image_ratio_custom_height_desktop": 7,
-                        "width_desktop": "fill",
-                        "width_custom_desktop": 100,
-                        "limit_width_desktop": false,
-                        "max_width_desktop": 1600,
-                        "image_ratio_mobile": "custom",
-                        "image_ratio_custom_width_mobile": 6,
-                        "image_ratio_custom_height_mobile": 7,
-                        "width_mobile": "fill",
-                        "width_custom_mobile": 100,
-                        "limit_width_mobile": false,
-                        "max_width_mobile": 1600,
-                        "corner_radius": "inherit",
-                        "custom_corner_radius": 0,
-                        "padding_top": 0,
-                        "padding_bottom": 0,
-                        "padding_left": 0,
-                        "padding_right": 0,
-                        "customize_mobile_padding": false,
-                        "padding_top_mobile": 0,
-                        "padding_bottom_mobile": 0,
-                        "padding_left_mobile": 0,
-                        "padding_right_mobile": 0
-                      },
-                      "blocks": {}
-                    }
-                  },
-                  "block_order": [
-                    "image"
-                  ]
+                  "blocks": {}
                 }
               },
               "block_order": [
-                "image-frame"
+                "image_YiKkKH"
               ]
             }
           },
@@ -3455,11 +3410,20 @@
             "columns_desktop": 2,
             "columns_tablet": 2,
             "columns_mobile": 1,
-            "gap": 0,
-            "gap_mobile": 0,
             "alignment": "middle",
             "customize_mobile_alignment": true,
-            "alignment_mobile": "middle"
+            "alignment_mobile": "middle",
+            "gap": 0,
+            "gap_mobile": 0,
+            "padding_top": 0,
+            "padding_bottom": 0,
+            "padding_left": 0,
+            "padding_right": 0,
+            "customize_mobile_padding": false,
+            "padding_top_mobile": 0,
+            "padding_bottom_mobile": 0,
+            "padding_left_mobile": 0,
+            "padding_right_mobile": 0
           },
           "blocks": {
             "media": {
@@ -3508,6 +3472,7 @@
                 "image": {
                   "type": "image",
                   "settings": {
+                    "image": "shopify://shop_images/pavillon-home-cta.jpg",
                     "show_image_first_mobile": false,
                     "image_link": "",
                     "open_in_new_tab": false,
