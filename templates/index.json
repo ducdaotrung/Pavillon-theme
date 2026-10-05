@@ -3347,7 +3347,7 @@
                 "answer": {
                   "type": "faq_answer_text",
                   "settings": {
-                    "text": "<p>Add your store’s answer here. Replace this sample with your actual service or policy details.</p>"
+                    "text": "<p>Yes - complimentary hand engraving is available on all ring styles. You can add your message at checkout. Please allow an additional 2 business days for engraving. Up to 20 characters recommended for the best result.</p>"
                   },
                   "blocks": {}
                 }
@@ -3370,7 +3370,7 @@
                 "answer": {
                   "type": "faq_answer_text",
                   "settings": {
-                    "text": "<p>Add your store’s answer here. Replace this sample with your actual service or policy details.</p>"
+                    "text": "<p>We offer free returns within 30 days of delivery on unworn, unaltered items in original packaging. Engraved or custom pieces are final sale. To begin a return, visit our Returns Portal or contact our team directly.</p>"
                   },
                   "blocks": {}
                 }
@@ -3393,7 +3393,7 @@
                 "answer": {
                   "type": "faq_answer_text",
                   "settings": {
-                    "text": "<p>Add your store’s answer here. Replace this sample with your actual service or policy details.</p>"
+                    "text": "<p>Absolutely. All diamonds used in Pavillon pieces are certified conflict-free under the Kimberley Process Certification Scheme. We also work with recycled 18k gold from verified, responsible suppliers. Full certification is available on request.</p>"
                   },
                   "blocks": {}
                 }
@@ -3416,7 +3416,7 @@
                 "answer": {
                   "type": "faq_answer_text",
                   "settings": {
-                    "text": "<p>Add your store’s answer here. Replace this sample with your actual service or policy details.</p>"
+                    "text": "<p>Yes. We partner with Klarna and Affirm to offer 0% interest installment plans on orders over $300. Simply select your preferred option at checkout. No hidden fees, no credit checks for Klarna Pay in 3.</p>"
                   },
                   "blocks": {}
                 }
