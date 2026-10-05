@@ -1559,7 +1559,7 @@
           "static": true,
           "settings": {
             "text": "<p>Every piece that leaves our studio passes through no fewer than forty pairs of hands. We believe jewelry should outlive trends and outlive us.</p>",
-            "size": "lg",
+            "size": "xl",
             "font_size": 40,
             "text_color": "",
             "width": "custom",
