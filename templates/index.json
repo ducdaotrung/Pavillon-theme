@@ -37,7 +37,7 @@
               "type": "eyebrow",
               "name": "t:general.eyebrow",
               "settings": {
-                "text": "<p>Timeless by Design</p>",
+                "text": "<p>TIMELESS BY DESIGN</p>",
                 "color": "",
                 "show_background": false,
                 "show_icon": false,
@@ -140,7 +140,7 @@
               "type": "eyebrow",
               "name": "t:general.eyebrow",
               "settings": {
-                "text": "<p>In Motion</p>",
+                "text": "<p>IN MOTION</p>",
                 "color": "",
                 "show_background": false,
                 "show_icon": false,
