@@ -2788,6 +2788,7 @@
                 "image": {
                   "type": "image",
                   "settings": {
+                    "image": "shopify://shop_images/pavillon-logo-1.png",
                     "show_image_first_mobile": false,
                     "image_link": "",
                     "open_in_new_tab": false,
@@ -2860,6 +2861,7 @@
                 "image": {
                   "type": "image",
                   "settings": {
+                    "image": "shopify://shop_images/pavillon-logo-2.png",
                     "show_image_first_mobile": false,
                     "image_link": "",
                     "open_in_new_tab": false,
@@ -2932,6 +2934,7 @@
                 "image": {
                   "type": "image",
                   "settings": {
+                    "image": "shopify://shop_images/pavillon-logo-3.png",
                     "show_image_first_mobile": false,
                     "image_link": "",
                     "open_in_new_tab": false,
@@ -3004,6 +3007,7 @@
                 "image": {
                   "type": "image",
                   "settings": {
+                    "image": "shopify://shop_images/pavillon-logo-4.png",
                     "show_image_first_mobile": false,
                     "image_link": "",
                     "open_in_new_tab": false,
@@ -3076,6 +3080,7 @@
                 "image": {
                   "type": "image",
                   "settings": {
+                    "image": "shopify://shop_images/pavillon-logo-5.png",
                     "show_image_first_mobile": false,
                     "image_link": "",
                     "open_in_new_tab": false,
