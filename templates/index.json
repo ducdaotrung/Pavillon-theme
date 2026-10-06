@@ -428,7 +428,7 @@
         "show_next_slide_preview_on_desktop": true,
         "product_gap_desktop": 24,
         "product_gap_mobile": 16,
-        "show_navigation_on_desktop": false,
+        "show_navigation_on_desktop": true,
         "navigation_position": "inside",
         "navigation_style": "secondary",
         "navigation_icon": "chevron",
