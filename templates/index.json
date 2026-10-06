@@ -1031,7 +1031,7 @@
           "type": "product-list",
           "static": true,
           "settings": {
-            "collection": "",
+            "collection": "curated-essentials",
             "max_products": 3,
             "layout_type": "carousel",
             "columns_desktop": "3",
