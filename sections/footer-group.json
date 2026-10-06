@@ -144,7 +144,26 @@
               "blocks": {
                 "footer-social-menu": {
                   "type": "social-links",
-                  "settings": {},
+                  "settings": {
+                    "display_mode": "icon",
+                    "direction": "horizontal",
+                    "gap_desktop": 10,
+                    "gap_mobile": 10,
+                    "icon_width": 20,
+                    "text_size": "md",
+                    "text_color": "",
+                    "padding": 10,
+                    "border_thickness": 0,
+                    "corner_radius": "full",
+                    "shadow": "extra_small",
+                    "color_type": "inherit",
+                    "color_scheme": "",
+                    "padding_top": 0,
+                    "padding_bottom": 0,
+                    "customize_mobile_padding": false,
+                    "padding_top_mobile": 0,
+                    "padding_bottom_mobile": 0
+                  },
                   "blocks": {}
                 }
               },
@@ -229,6 +248,8 @@
                     "icon_position": "after",
                     "icon_size": "inherit",
                     "icon_width": 20,
+                    "color_scheme": "",
+                    "background_color": "",
                     "padding_top": 0,
                     "padding_bottom": 0,
                     "padding_left": 0,
@@ -340,6 +361,7 @@
           "type": "group",
           "settings": {
             "direction": "horizontal",
+            "wrap_items": false,
             "position": "center",
             "position_horizontal": "center",
             "horizontal_alignment": "space-between",
@@ -382,6 +404,7 @@
               "type": "group",
               "settings": {
                 "direction": "horizontal",
+                "wrap_items": false,
                 "position": "center",
                 "position_horizontal": "center",
                 "horizontal_alignment": "left",
@@ -425,6 +448,7 @@
                   "settings": {
                     "text": "<p>© 2026 Omnise. Powered by Shopify.</p>",
                     "text_size": "sm",
+                    "height_limit": "none",
                     "text_color": "",
                     "width": "fit",
                     "max_width": 640,
@@ -465,6 +489,7 @@
               "type": "group",
               "settings": {
                 "direction": "horizontal",
+                "wrap_items": false,
                 "position": "center",
                 "position_horizontal": "center",
                 "horizontal_alignment": "right",
@@ -550,6 +575,7 @@
         "footer-divider",
         "footer-grid-utility"
       ],
+      "disabled": true,
       "settings": {
         "section_width": "page_width",
         "gap_desktop": 24,

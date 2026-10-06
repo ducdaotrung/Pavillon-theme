@@ -13,7 +13,34 @@
   "sections": {
     "announcement-bar": {
       "type": "announcement-bar",
+      "blocks": {
+        "announcement-shipping": {
+          "type": "announcement-text",
+          "settings": {
+            "text": "Free standard shipping on all orders",
+            "text_color": "",
+            "width": "fill",
+            "max_width": 640
+          },
+          "blocks": {}
+        },
+        "announcement-engraving": {
+          "type": "announcement-text",
+          "settings": {
+            "text": "Complimentary engraving on all rings",
+            "text_color": "",
+            "width": "fill",
+            "max_width": 640
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "announcement-shipping",
+        "announcement-engraving"
+      ],
       "settings": {
+        "bottom_separator": false,
         "type": "slider",
         "speed": 1,
         "direction": "left",
@@ -24,41 +51,14 @@
         "font_size": "sm",
         "background_type": "none",
         "overlay": false,
+        "overlay_color": "#00000033",
         "gap": 16,
         "color_scheme": "scheme-3",
-        "bottom_separator": false,
         "padding_top": 8,
         "padding_right": 0,
         "padding_bottom": 8,
-        "padding_left": 0,
-        "overlay_color": "#00000033"
-      },
-      "blocks": {
-        "announcement-shipping": {
-          "type": "announcement-text",
-          "settings": {
-            "text": "Free standard shipping on all orders",
-            "width": "fill",
-            "text_color": "",
-            "max_width": 640
-          },
-          "blocks": {}
-        },
-        "announcement-engraving": {
-          "type": "announcement-text",
-          "settings": {
-            "text": "Complimentary engraving on all rings",
-            "width": "fill",
-            "text_color": "",
-            "max_width": 640
-          },
-          "blocks": {}
-        }
-      },
-      "block_order": [
-        "announcement-shipping",
-        "announcement-engraving"
-      ]
+        "padding_left": 0
+      }
     },
     "header": {
       "type": "header",
@@ -279,6 +279,7 @@
           ]
         }
       },
+      "disabled": true,
       "settings": {
         "section_width": "page_width",
         "icon_size": 20,
