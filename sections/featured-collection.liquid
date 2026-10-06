@@ -66,9 +66,6 @@
     <div class="featured-collection__header">
       {% content_for 'block', type: 'header', id: 'header' %}
     </div>
-    <div class="featured-collection__actions" data-featured-collection-actions>
-      {% content_for 'block', type: 'view-all-button', id: 'featured-collection-view-all', closest.collection: featured_collection_collection %}
-    </div>
     <div class="featured-collection__products">
       {% content_for 'block', type: 'product-list', id: 'product-list' %}
     </div>
@@ -79,6 +76,9 @@
         {{ featured_collection_additional_blocks }}
       </div>
     {% endif %}
+    <div class="featured-collection__actions" data-featured-collection-actions>
+      {% content_for 'block', type: 'view-all-button', id: 'featured-collection-view-all', closest.collection: featured_collection_collection %}
+    </div>
   </div>
 </div>
 
