@@ -269,7 +269,7 @@
           "type": "collection-tab",
           "settings": {
             "label": "NEW ARRIVALS",
-            "collection": ""
+            "collection": "new-arrivals"
           },
           "blocks": {
             "product-card": {
