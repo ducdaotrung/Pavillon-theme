@@ -4200,6 +4200,298 @@
         "padding_top_mobile": 0,
         "padding_bottom_mobile": 0
       }
+    },
+    "faq_image_accordion_THKBxa": {
+      "type": "faq-image-accordion",
+      "blocks": {
+        "group_h4eQXr": {
+          "type": "group",
+          "settings": {
+            "direction": "vertical",
+            "wrap_items": false,
+            "position": "center",
+            "position_horizontal": "center",
+            "horizontal_alignment": "left",
+            "customize_mobile_alignment": true,
+            "alignment": "left",
+            "alignment_mobile": "left",
+            "gap_desktop": 16,
+            "gap_mobile": 12,
+            "device": "desktop",
+            "width": "fill",
+            "width_custom": 100,
+            "limit_width": false,
+            "max_width": 640,
+            "height": "fill",
+            "width_mobile": "fit",
+            "width_custom_mobile": 100,
+            "limit_width_mobile": false,
+            "max_width_mobile": 480,
+            "appearance_type": "inherit",
+            "color_scheme": "",
+            "background_color": "",
+            "border_type": "none",
+            "border_color": "",
+            "corner_radius": "square",
+            "shadow": "none",
+            "overlay_color": "",
+            "backdrop_blur": 20,
+            "padding_top": 0,
+            "padding_bottom": 0,
+            "padding_left": 0,
+            "padding_right": 0,
+            "customize_mobile_padding": false,
+            "padding_top_mobile": 0,
+            "padding_bottom_mobile": 0,
+            "padding_left_mobile": 0,
+            "padding_right_mobile": 0
+          },
+          "blocks": {
+            "heading_eLTHiD": {
+              "type": "heading",
+              "settings": {
+                "text": "<p>FAQs</p>",
+                "heading_size": "lg",
+                "custom_heading_size": 24,
+                "html_tag": "h2",
+                "text_color": "",
+                "width": "fit",
+                "max_width": 640,
+                "customize_mobile_size": false,
+                "width_mobile": "fit",
+                "max_width_mobile": 480,
+                "padding_top": 0,
+                "padding_bottom": 0,
+                "padding_left": 0,
+                "padding_right": 0,
+                "customize_mobile_padding": false,
+                "padding_top_mobile": 0,
+                "padding_bottom_mobile": 0,
+                "padding_left_mobile": 0,
+                "padding_right_mobile": 0
+              },
+              "blocks": {}
+            },
+            "text_aQ7ywT": {
+              "type": "text",
+              "settings": {
+                "text": "<p>Find answers to common questions about our products, shipping, returns, payments, and store policies.</p>",
+                "text_size": "md",
+                "height_limit": "none",
+                "text_color": "",
+                "width": "fit",
+                "max_width": 640,
+                "customize_mobile_size": false,
+                "width_mobile": "fit",
+                "max_width_mobile": 480,
+                "padding_top": 0,
+                "padding_bottom": 0,
+                "padding_left": 0,
+                "padding_right": 0,
+                "customize_mobile_padding": false,
+                "padding_top_mobile": 0,
+                "padding_bottom_mobile": 0,
+                "padding_left_mobile": 0,
+                "padding_right_mobile": 0
+              },
+              "blocks": {}
+            }
+          },
+          "block_order": [
+            "heading_eLTHiD",
+            "text_aQ7ywT"
+          ]
+        },
+        "group_T94rQK": {
+          "type": "group",
+          "settings": {
+            "direction": "vertical",
+            "wrap_items": false,
+            "position": "center",
+            "position_horizontal": "center",
+            "horizontal_alignment": "left",
+            "customize_mobile_alignment": true,
+            "alignment": "center",
+            "alignment_mobile": "left",
+            "gap_desktop": 0,
+            "gap_mobile": 0,
+            "device": "desktop",
+            "width": "fill",
+            "width_custom": 100,
+            "limit_width": false,
+            "max_width": 640,
+            "height": "fill",
+            "width_mobile": "fit",
+            "width_custom_mobile": 100,
+            "limit_width_mobile": false,
+            "max_width_mobile": 480,
+            "appearance_type": "inherit",
+            "color_scheme": "",
+            "background_color": "",
+            "border_type": "none",
+            "border_color": "",
+            "corner_radius": "square",
+            "shadow": "none",
+            "overlay_color": "",
+            "backdrop_blur": 20,
+            "padding_top": 0,
+            "padding_bottom": 0,
+            "padding_left": 0,
+            "padding_right": 0,
+            "customize_mobile_padding": false,
+            "padding_top_mobile": 0,
+            "padding_bottom_mobile": 0,
+            "padding_left_mobile": 0,
+            "padding_right_mobile": 0
+          },
+          "blocks": {
+            "image_aNwFTJ": {
+              "type": "image",
+              "settings": {
+                "show_image_first_mobile": false,
+                "image_link": "",
+                "open_in_new_tab": false,
+                "alt_text": "",
+                "device": "desktop",
+                "image_ratio_desktop": "auto",
+                "image_ratio_custom_width_desktop": 16,
+                "image_ratio_custom_height_desktop": 9,
+                "width_desktop": "fill",
+                "width_custom_desktop": 100,
+                "limit_width_desktop": false,
+                "max_width_desktop": 1600,
+                "image_ratio_mobile": "auto",
+                "image_ratio_custom_width_mobile": 16,
+                "image_ratio_custom_height_mobile": 9,
+                "width_mobile": "fill",
+                "width_custom_mobile": 100,
+                "limit_width_mobile": false,
+                "max_width_mobile": 1600,
+                "corner_radius": "square",
+                "custom_corner_radius": 0,
+                "padding_top": 0,
+                "padding_bottom": 0,
+                "padding_left": 0,
+                "padding_right": 0,
+                "customize_mobile_padding": false,
+                "padding_top_mobile": 0,
+                "padding_bottom_mobile": 0,
+                "padding_left_mobile": 0,
+                "padding_right_mobile": 0
+              },
+              "blocks": {}
+            }
+          },
+          "block_order": [
+            "image_aNwFTJ"
+          ]
+        },
+        "faq_accordion_AHnAhT": {
+          "type": "faq_accordion",
+          "settings": {
+            "style": "simple",
+            "icon": "chevron",
+            "dividers": true,
+            "question_tag": "h4",
+            "question_font_size": "xs",
+            "answer_font_size": "md",
+            "customize_mobile_font_size": false,
+            "question_font_size_mobile": "xs",
+            "answer_font_size_mobile": "md",
+            "gap_desktop": 16,
+            "gap_mobile": 16,
+            "width": "fill",
+            "custom_width": 100,
+            "limit_width": false,
+            "max_width": 1100,
+            "border_thickness": 1,
+            "shadow": "none",
+            "padding": "medium",
+            "padding_top": 16,
+            "padding_right": 20,
+            "padding_bottom": 16,
+            "padding_left": 20,
+            "color_scheme": ""
+          },
+          "blocks": {
+            "faq_item_EJK7RN": {
+              "type": "faq_item",
+              "settings": {
+                "question": "What is your return policy?",
+                "show_question_icon": true,
+                "question_icon": "document-text",
+                "question_icon_gap": 8,
+                "question_icon_size": 20,
+                "initially_open": false
+              },
+              "blocks": {}
+            },
+            "faq_item_YPrB48": {
+              "type": "faq_item",
+              "settings": {
+                "question": "How long does shipping take?",
+                "show_question_icon": true,
+                "question_icon": "truck",
+                "question_icon_gap": 8,
+                "question_icon_size": 20,
+                "initially_open": false
+              },
+              "blocks": {}
+            },
+            "faq_item_LFpwg6": {
+              "type": "faq_item",
+              "settings": {
+                "question": "Which payment methods do you accept?",
+                "show_question_icon": true,
+                "question_icon": "receipt-percent",
+                "question_icon_gap": 8,
+                "question_icon_size": 20,
+                "initially_open": false
+              },
+              "blocks": {}
+            },
+            "faq_item_Emd7XB": {
+              "type": "faq_item",
+              "settings": {
+                "question": "How can I contact support?",
+                "show_question_icon": true,
+                "question_icon": "share",
+                "question_icon_gap": 8,
+                "question_icon_size": 20,
+                "initially_open": false
+              },
+              "blocks": {}
+            }
+          },
+          "block_order": [
+            "faq_item_EJK7RN",
+            "faq_item_YPrB48",
+            "faq_item_LFpwg6",
+            "faq_item_Emd7XB"
+          ]
+        }
+      },
+      "block_order": [
+        "group_h4eQXr",
+        "group_T94rQK",
+        "faq_accordion_AHnAhT"
+      ],
+      "name": "FAQ Image Accordion",
+      "settings": {
+        "section_width": "page_width",
+        "layout": "horizontal",
+        "position": "top",
+        "alignment": "left",
+        "horizontal_alignment": "left",
+        "vertical_on_mobile": true,
+        "alignment_mobile": "left",
+        "gap_desktop": 48,
+        "gap_mobile": 32,
+        "color_scheme": "scheme-1",
+        "background_color": "",
+        "padding_top": 48,
+        "padding_bottom": 48
+      }
     }
   },
   "order": [
@@ -4213,6 +4505,7 @@
     "testimonial-carousel",
     "featured-in-press",
     "faq-accordion",
-    "jewelry-that-remembers"
+    "jewelry-that-remembers",
+    "faq_image_accordion_THKBxa"
   ]
 }
