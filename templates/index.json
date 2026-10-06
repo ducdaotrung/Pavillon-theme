@@ -288,7 +288,7 @@
           "type": "collection-tab",
           "settings": {
             "label": "BEST SELLERS",
-            "collection": ""
+            "collection": "best-sellers"
           },
           "blocks": {
             "product-card": {
