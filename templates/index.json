@@ -239,7 +239,7 @@
         "override_slide_alignment": true,
         "content_vertical_alignment": "center",
         "content_horizontal_alignment": "center",
-        "desktop_height": "medium",
+        "desktop_height": "extra_large",
         "mobile_height": "small",
         "autoplay": false,
         "pause_on_hover": true,
