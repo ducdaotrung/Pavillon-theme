@@ -2151,7 +2151,7 @@
             "pagination_type": "progress_bar",
             "controls_style": "fraction",
             "controls_alignment": "left",
-            "controls_alignment_mobile": "center",
+            "controls_alignment_mobile": "left",
             "show_pagination_on_desktop": false,
             "pagination_padding_desktop": 40,
             "show_pagination_on_mobile": false,
