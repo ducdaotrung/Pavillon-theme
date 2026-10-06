@@ -933,7 +933,7 @@
           "type": "header",
           "static": true,
           "settings": {
-            "width": "fit",
+            "width": "fill",
             "max_width": 750,
             "customize_mobile_size": false,
             "width_mobile": "fit",
