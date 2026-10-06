@@ -1009,26 +1009,6 @@
             "heading"
           ]
         },
-        "featured-collection-view-all": {
-          "type": "view-all-button",
-          "static": true,
-          "settings": {
-            "button_label": "View All products",
-            "button_link": "shopify://collections/curated-essentials",
-            "button_open_in_new_tab": false,
-            "button_style": "text",
-            "show_icon": false,
-            "icon": "arrow_right",
-            "icon_position": "after",
-            "icon_size": "inherit",
-            "icon_width": 20,
-            "button_style_mobile": "outline",
-            "button_height_mobile": "inherit",
-            "full_width_mobile": true,
-            "show_icon_mobile": false
-          },
-          "blocks": {}
-        },
         "product-list": {
           "type": "product-list",
           "static": true,
@@ -1068,6 +1048,26 @@
             }
           },
           "block_order": []
+        },
+        "featured-collection-view-all": {
+          "type": "view-all-button",
+          "static": true,
+          "settings": {
+            "button_label": "View All products",
+            "button_link": "shopify://collections/curated-essentials",
+            "button_open_in_new_tab": false,
+            "button_style": "text",
+            "show_icon": false,
+            "icon": "arrow_right",
+            "icon_position": "after",
+            "icon_size": "inherit",
+            "icon_width": 20,
+            "button_style_mobile": "text",
+            "button_height_mobile": "inherit",
+            "full_width_mobile": true,
+            "show_icon_mobile": false
+          },
+          "blocks": {}
         }
       },
       "name": "Featured collection",
