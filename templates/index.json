@@ -2109,7 +2109,7 @@
         "carousel-1": {
           "type": "carousel",
           "settings": {
-            "transition_style": "slide",
+            "transition_style": "fade",
             "columns_desktop": "1",
             "columns_mobile": "1",
             "loop": true,
