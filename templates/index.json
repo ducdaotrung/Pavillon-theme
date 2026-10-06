@@ -1012,7 +1012,7 @@
           "static": true,
           "settings": {
             "button_label": "View all",
-            "button_link": "",
+            "button_link": "shopify://collections/curated-essentials",
             "button_open_in_new_tab": false,
             "button_style": "text",
             "show_icon": false,
