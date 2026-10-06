@@ -3883,10 +3883,82 @@
               "block_order": [
                 "faq_answer_text_rhzJde"
               ]
+            },
+            "faq-2": {
+              "type": "faq_item",
+              "settings": {
+                "question": "What is your returns policy?",
+                "show_question_icon": false,
+                "question_icon": "check",
+                "question_icon_gap": 8,
+                "question_icon_size": 20,
+                "initially_open": false
+              },
+              "blocks": {
+                "answer": {
+                  "type": "faq_answer_text",
+                  "settings": {
+                    "text": "<p>We offer free returns within 30 days of delivery on unworn, unaltered items in original packaging. Engraved or custom pieces are final sale. To begin a return, visit our Returns Portal or contact our team directly.</p>"
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "answer"
+              ]
+            },
+            "faq-3": {
+              "type": "faq_item",
+              "settings": {
+                "question": "Are your diamonds ethically sourced?",
+                "show_question_icon": false,
+                "question_icon": "check",
+                "question_icon_gap": 8,
+                "question_icon_size": 20,
+                "initially_open": false
+              },
+              "blocks": {
+                "answer": {
+                  "type": "faq_answer_text",
+                  "settings": {
+                    "text": "<p>Absolutely. All diamonds used in Pavillon pieces are certified conflict-free under the Kimberley Process Certification Scheme. We also work with recycled 18k gold from verified, responsible suppliers. Full certification is available on request.</p>"
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "answer"
+              ]
+            },
+            "faq-4": {
+              "type": "faq_item",
+              "settings": {
+                "question": "Do you offer financing or pay later options?",
+                "show_question_icon": false,
+                "question_icon": "check",
+                "question_icon_gap": 8,
+                "question_icon_size": 20,
+                "initially_open": false
+              },
+              "blocks": {
+                "answer": {
+                  "type": "faq_answer_text",
+                  "settings": {
+                    "text": "<p>Yes. We partner with Klarna and Affirm to offer 0% interest installment plans on orders over $300. Simply select your preferred option at checkout. No hidden fees, no credit checks for Klarna Pay in 3.</p>"
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "answer"
+              ]
             }
           },
           "block_order": [
-            "faq_item_Cn3TyY"
+            "faq_item_Cn3TyY",
+            "faq-2",
+            "faq-3",
+            "faq-4"
           ]
         }
       },
