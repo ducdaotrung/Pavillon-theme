@@ -509,7 +509,7 @@
         "suspense": {
           "type": "collections-with-tabs-item",
           "settings": {
-            "collection": "",
+            "collection": "suspense",
             "custom_title": "",
             "color_type": "inherit",
             "color_scheme": "",
@@ -603,7 +603,7 @@
         "overtone": {
           "type": "collections-with-tabs-item",
           "settings": {
-            "collection": "",
+            "collection": "overtone",
             "custom_title": "",
             "color_type": "inherit",
             "color_scheme": "",
@@ -697,7 +697,7 @@
         "ondine": {
           "type": "collections-with-tabs-item",
           "settings": {
-            "collection": "",
+            "collection": "ondine",
             "custom_title": "",
             "color_type": "inherit",
             "color_scheme": "",
@@ -791,7 +791,7 @@
         "gossamer": {
           "type": "collections-with-tabs-item",
           "settings": {
-            "collection": "",
+            "collection": "gossamer",
             "custom_title": "",
             "color_type": "inherit",
             "color_scheme": "",
