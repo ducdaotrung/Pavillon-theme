@@ -54,11 +54,13 @@
     <div class="collections-with-tabs__intro">
       {% if section.settings.presentation == 'editorial' or block.settings.intro_content_source == 'collection' %}
         {% if item_collection != blank %}
-          <h2 class="heading-text heading-md">{{ item_collection.title | escape }}</h2>
+          {% unless section.settings.presentation == 'editorial' %}
+            <h2 class="heading-text heading-md">{{ item_collection.title | escape }}</h2>
+          {% endunless %}
           {% if item_collection.description != blank %}
             <div class="body-text body-sm rte">{{ item_collection.description }}</div>
           {% endif %}
-          {% render 'theme-button', label: 'SHOP ALL', url: item_collection.url, variant: 'tertiary' %}
+          {% render 'theme-button', label: 'SHOP ALL', url: item_collection.url, variant: 'tertiary', class: 'collections-with-tabs__intro-button' %}
         {% elsif request.design_mode %}
           <p class="body-text body-sm">Select a collection to display its title and description.</p>
         {% endif %}
